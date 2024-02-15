@@ -148,7 +148,7 @@ public class UsersServiceImpl implements UsersService {
 
     public Boolean validationForSaveUsers( String requestId) {
         Boolean flag = false;
-        OtpVerification dataByEmailOrOtpAndUId = otpVerificationRepository.getDataByEmailOrOtpAndUId(requestId);
+        OtpVerification dataByEmailOrOtpAndUId = otpVerificationRepository.getDataByUId(requestId);
         if(dataByEmailOrOtpAndUId != null){
             flag = true;
         }

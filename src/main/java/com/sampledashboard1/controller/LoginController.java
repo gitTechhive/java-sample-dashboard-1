@@ -8,12 +8,14 @@ import com.sampledashboard1.filter.ResponseWrapperDTO;
 import com.sampledashboard1.model.Login;
 import com.sampledashboard1.model.RefreshToken;
 import com.sampledashboard1.model.Users;
+import com.sampledashboard1.payload.request.ForgotPassRequest;
 import com.sampledashboard1.payload.request.LoginRequest;
 import com.sampledashboard1.payload.request.TokenRefreshRequest;
 import com.sampledashboard1.payload.response.LoginResponse;
 import com.sampledashboard1.payload.response.TokenRefreshResponse;
 import com.sampledashboard1.repository.LoginRepository;
 import com.sampledashboard1.repository.UsersRepository;
+import com.sampledashboard1.service.LoginService;
 import com.sampledashboard1.service.RefreshTokenService;
 import com.sampledashboard1.utils.MessageUtils;
 import com.sampledashboard1.utils.MethodUtils;
@@ -26,9 +28,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequiredArgsConstructor
@@ -41,6 +41,7 @@ public class LoginController {
     private final RefreshTokenService refreshTokenService;
     private final LoginRepository loginRepository;
     private final UsersRepository usersRepository;
+    private final LoginService loginService;
 
 
     @PostMapping("login")
@@ -88,6 +89,22 @@ public class LoginController {
                     return ResponseWrapperDTO.successResponse(MessageUtils.get("login.controller.refreshToken"), TokenRefreshResponse.builder().token(token).refreshToken(newRefreshToken.getToken()).build(), httpServletRequest);
                 })
                 .orElseThrow(() -> new TokenRefreshException(MessageUtils.get("login.controller.val.refreshToken")));
+    }
+
+    @PostMapping("forgotPwdSendEmail")
+    public ResponseWrapperDTO forgotPwdSendEmail(@RequestBody ForgotPassRequest request, HttpServletRequest httpServletRequest) {
+        String res = loginService.forgotPwdSendEmail(request.getEmail());
+        return ResponseWrapperDTO.successResponse(res, res, httpServletRequest);
+    }
+    @PostMapping("/forgotPwdOtpVerification")
+    public ResponseWrapperDTO forgotPwdOtpVerification(@RequestBody ForgotPassRequest request,  HttpServletRequest httpServletRequest) {
+        String res = loginService.forgotPwdOtpVerification(request.getEmail(), request.getOtp());
+        return ResponseWrapperDTO.successResponse(res, res, httpServletRequest);
+    }
+    @PostMapping("/forgotPwd")
+    public ResponseWrapperDTO forgotPwd(@RequestParam String email,@RequestParam String password,  HttpServletRequest httpServletRequest) {
+        String res = loginService.forgotPwd(email, password);
+        return ResponseWrapperDTO.successResponse(res, res, httpServletRequest);
     }
 
 }

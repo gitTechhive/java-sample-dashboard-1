@@ -1,6 +1,6 @@
 # java-sample-project-1
 
-Welcome to the sample-dashboard-1 project! This project is built using Spring Boot and Java 17, with a MySQL database.
+Welcome to the java-sample-dashboard-1 project! This project is built using Spring Boot and Java 17, with a MySQL database.
 
 ## Prerequisites
 

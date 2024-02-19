@@ -16,6 +16,8 @@ public class LoginRequest {
    // @NotEmpty(message = "password can't not be null")
     private String password;
     private Long mobileNo;
-    private String loginType;
+    private String type;
+    private String googleId;
+
 
 }

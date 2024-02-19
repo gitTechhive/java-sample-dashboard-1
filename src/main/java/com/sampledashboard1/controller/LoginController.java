@@ -2,15 +2,14 @@ package com.sampledashboard1.controller;
 
 import com.sampledashboard1.config.security.CustomUserDetailsService;
 import com.sampledashboard1.config.security.jwt.JwtProvider;
+import com.sampledashboard1.enums.EnumForLoginType;
 import com.sampledashboard1.exception.TokenRefreshException;
 import com.sampledashboard1.exception.UserDefineException;
 import com.sampledashboard1.filter.ResponseWrapperDTO;
 import com.sampledashboard1.model.Login;
 import com.sampledashboard1.model.RefreshToken;
 import com.sampledashboard1.model.Users;
-import com.sampledashboard1.payload.request.ForgotPassRequest;
-import com.sampledashboard1.payload.request.LoginRequest;
-import com.sampledashboard1.payload.request.TokenRefreshRequest;
+import com.sampledashboard1.payload.request.*;
 import com.sampledashboard1.payload.response.LoginResponse;
 import com.sampledashboard1.payload.response.TokenRefreshResponse;
 import com.sampledashboard1.repository.LoginRepository;
@@ -47,33 +46,70 @@ public class LoginController {
     @PostMapping("login")
     public ResponseWrapperDTO login(@RequestBody LoginRequest loginForm, HttpServletRequest httpServletRequest) {
 
-        Authentication authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(loginForm.getEmail(), loginForm.getPassword()));
-        SecurityContextHolder.getContext().setAuthentication(authentication);
+        if(loginForm.getType().equals(EnumForLoginType.EMAIL.value())){
+            Authentication authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(loginForm.getEmail(), loginForm.getPassword()));
+            SecurityContextHolder.getContext().setAuthentication(authentication);
 
-        UserDetails userDetails = userDetailsService.loadUserByUsername(loginForm.getEmail());
+            UserDetails userDetails = userDetailsService.loadUserByUsername(loginForm.getEmail());
 
-        Login login = loginRepository.findByEmail(loginForm.getEmail()).orElseThrow(() -> new UserDefineException("user not found"));
-        String jwt = jwtProvider.generateToken(userDetails);
-        if (Boolean.FALSE.equals(login.getIsActive())) {
-            throw new UserDefineException("User not active, Please contact admin");
+            Login login = loginRepository.findByEmail(loginForm.getEmail()).orElseThrow(() -> new UserDefineException("user not found"));
+            String jwt = jwtProvider.generateToken(userDetails);
+            if (Boolean.FALSE.equals(login.getIsActive())) {
+                throw new UserDefineException("User not active, Please contact admin");
+            }
+
+            RefreshToken refreshToken = refreshTokenService.createRefreshToken(login.getId());
+
+            Users users = usersRepository.getUserByLoginId(login.getId()).orElse(null);
+            LoginResponse.LoginResponseBuilder responseBuilder = LoginResponse.builder()
+                    .id(login.getId())
+                    .token(jwt)
+                    .refreshToken(refreshToken.getToken())
+                    .email(login.getEmail());
+
+            if (!MethodUtils.isObjectisNullOrEmpty(users)) {
+                assert users != null;
+                responseBuilder.firstName(users.getFirstName())
+                        .userId(users.getId())
+                        .lastName(users.getLastName());
+            }
+            return ResponseWrapperDTO.successResponse(MessageUtils.get("login.controller.login"), responseBuilder.build(), httpServletRequest);
+        } else if(loginForm.getType().equals(EnumForLoginType.Google.value())){
+
+            UserDetails userDetails = userDetailsService.loadUserByUsername(loginForm.getEmail());
+
+            Login login = loginRepository.findByEmail(loginForm.getEmail()).orElseThrow(() -> new UserDefineException("user not found"));
+            if(loginForm.getGoogleId() != null &&  !loginForm.getGoogleId().isEmpty()) {
+                Login login1 = loginRepository.findByGoogleId(loginForm.getGoogleId());
+                if (login1 == null) {
+                    login.setGoogleId(loginForm.getGoogleId());
+                    loginRepository.save(login);
+                }
+            }
+            String jwt = jwtProvider.generateToken(userDetails);
+            if (Boolean.FALSE.equals(login.getIsActive())) {
+                throw new UserDefineException("User not active, Please contact admin");
+            }
+
+            RefreshToken refreshToken = refreshTokenService.createRefreshToken(login.getId());
+
+            Users users = usersRepository.getUserByLoginId(login.getId()).orElse(null);
+            LoginResponse.LoginResponseBuilder responseBuilder = LoginResponse.builder()
+                    .id(login.getId())
+                    .token(jwt)
+                    .refreshToken(refreshToken.getToken())
+                    .email(login.getEmail());
+
+            if (!MethodUtils.isObjectisNullOrEmpty(users)) {
+                assert users != null;
+                responseBuilder.firstName(users.getFirstName())
+                        .userId(users.getId())
+                        .lastName(users.getLastName());
+            }
+            return ResponseWrapperDTO.successResponse(MessageUtils.get("login.controller.login"), responseBuilder.build(), httpServletRequest);
+
         }
-
-        RefreshToken refreshToken = refreshTokenService.createRefreshToken(login.getId());
-
-        Users users = usersRepository.getUserByLoginId(login.getId()).orElse(null);
-        LoginResponse.LoginResponseBuilder responseBuilder = LoginResponse.builder()
-                .id(login.getId())
-                .token(jwt)
-                .refreshToken(refreshToken.getToken())
-                .email(login.getEmail());
-
-        if (!MethodUtils.isObjectisNullOrEmpty(users)) {
-            assert users != null;
-            responseBuilder.firstName(users.getFirstName())
-                    .userId(users.getId())
-                    .lastName(users.getLastName());
-        }
-        return ResponseWrapperDTO.successResponse("Login successfully.", responseBuilder.build(), httpServletRequest);
+        return null;
     }
 
     @PostMapping("refreshToken")
@@ -91,19 +127,50 @@ public class LoginController {
                 .orElseThrow(() -> new TokenRefreshException(MessageUtils.get("login.controller.val.refreshToken")));
     }
 
+    /**
+     * This API Used for forgot password send OTP in  mail
+     * @param request
+     * @param httpServletRequest
+     * @return
+     */
     @PostMapping("forgotPwdSendEmail")
-    public ResponseWrapperDTO forgotPwdSendEmail(@RequestBody ForgotPassRequest request, HttpServletRequest httpServletRequest) {
+    public ResponseWrapperDTO forgotPwdSendEmail(@RequestBody ForgotPassSendOtpRequest request, HttpServletRequest httpServletRequest) {
         String res = loginService.forgotPwdSendEmail(request.getEmail());
         return ResponseWrapperDTO.successResponse(res, res, httpServletRequest);
     }
+
+    /**
+     * This API Used for forgot password OTP Verification
+     * @param request
+     * @param httpServletRequest
+     * @return
+     */
     @PostMapping("/forgotPwdOtpVerification")
-    public ResponseWrapperDTO forgotPwdOtpVerification(@RequestBody ForgotPassRequest request,  HttpServletRequest httpServletRequest) {
+    public ResponseWrapperDTO forgotPwdOtpVerification(@RequestBody ForgotPassSendOtpRequest request, HttpServletRequest httpServletRequest) {
         String res = loginService.forgotPwdOtpVerification(request.getEmail(), request.getOtp());
         return ResponseWrapperDTO.successResponse(res, res, httpServletRequest);
     }
+
+    /**
+     * This API Used for forgot Password
+     * @param httpServletRequest
+     * @return
+     */
     @PostMapping("/forgotPwd")
-    public ResponseWrapperDTO forgotPwd(@RequestParam String email,@RequestParam String password,  HttpServletRequest httpServletRequest) {
-        String res = loginService.forgotPwd(email, password);
+    public ResponseWrapperDTO forgotPwd(@RequestBody ForgotPassRequest forgotPassRequest, HttpServletRequest httpServletRequest) {
+        String res = loginService.forgotPwd(forgotPassRequest.getEmail(), forgotPassRequest.getPassword());
+        return ResponseWrapperDTO.successResponse(res, res, httpServletRequest);
+    }
+
+    /**
+     * This API Used for change Password
+     * @param request
+     * @param httpServletRequest
+     *
+     */
+    @PostMapping("/changePwd")
+    public ResponseWrapperDTO changePwd(@Valid @RequestBody ChangePassRequest request, HttpServletRequest httpServletRequest) {
+        String res = loginService.changePwd(request.getCrnPass(), request.getPwd());
         return ResponseWrapperDTO.successResponse(res, res, httpServletRequest);
     }
 

@@ -24,6 +24,7 @@ public class Login  extends Auditable<Long> {
      */
     private String email;
     private String password;
+    private String googleId;
 
     /**
      * Other details

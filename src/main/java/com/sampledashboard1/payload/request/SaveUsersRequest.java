@@ -17,15 +17,18 @@ public class SaveUsersRequest {
     @NotEmpty(message = "{users.lastName.is.required}")
     private String lastName;
     private String address;
-    private String country;
-    private String state;
     private String pinCode;
     @Email(message = "{users.email.is.required}")
     private String email;
     @NotNull(message = "{users.mobileNo.is.required}")
     private Long mobileNo;
-    @NotNull(message = "{users.otp.is.required}")
+   // @NotNull(message = "{users.otp.is.required}")
     private String otp;
-    @NotNull(message = "{users.requestId.is.required}")
+ //   @NotNull(message = "{users.requestId.is.required}")
     private String requestId;
+    private Long cities_id;
+    private Long  country_id;
+    private Long state_id;
+    private String bio;
+    private String phonecode;
 }

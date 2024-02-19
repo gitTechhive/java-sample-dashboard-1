@@ -24,4 +24,5 @@ public interface LoginRepository extends JpaRepository<Login, Long> {
             """)
     Optional<Login> getByLoginId(Long id);
     Optional<Login> findById(Long id);
+    Login findByGoogleId(String googleId);
 }

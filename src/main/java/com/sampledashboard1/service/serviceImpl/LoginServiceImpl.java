@@ -9,6 +9,7 @@ import com.sampledashboard1.repository.OtpVerificationRepository;
 import com.sampledashboard1.service.LoginService;
 import com.sampledashboard1.utils.MessageUtils;
 import com.sampledashboard1.utils.MethodUtils;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -64,5 +65,17 @@ public class LoginServiceImpl implements LoginService {
         login.setPassword(passwordEncoder.encode(password));
         loginRepository.save(login);
         return "password save successfully";
+    }
+    @Override
+    @Transactional
+    public String changePwd(String crnPass, String pwd) {
+        String currentLoginId = MethodUtils.getCurrentLoginId();
+        Login login = loginRepository.findById(Long.valueOf(currentLoginId)).orElseThrow(() -> new UserDefineException(MessageUtils.get("login.not.found")));
+        if (Boolean.FALSE.equals(passwordEncoder.matches(crnPass, login.getPassword()))) {
+            throw new UserDefineException(MessageUtils.get("login.service.val.pwd.matched"));
+        }
+        login.setPassword(passwordEncoder.encode(pwd));
+        loginRepository.save(login);
+        return MessageUtils.get("login.service.change.pwd");
     }
 }

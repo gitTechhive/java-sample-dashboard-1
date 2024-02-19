@@ -8,9 +8,9 @@ import lombok.Setter;
 @Getter
 @Setter
 @JsonInclude(JsonInclude.Include.NON_EMPTY)
-public class ForgotPassRequest {
-    @NotEmpty(message = "{forgotPass.token.is.required}")
-    String email;
-    @NotEmpty(message = "{forgotPass.password.is.required}")
-    String password;
+public class ChangePassRequest {
+    @NotEmpty(message = "{changePass.crnPass.is.required}")
+    String crnPass;
+    @NotEmpty(message = "{changePass.pwd.is.required}")
+    String pwd;
 }

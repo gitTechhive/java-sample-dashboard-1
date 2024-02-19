@@ -26,11 +26,11 @@ public class Auditable<U> {
     protected Long id;
     @CreatedDate
     @JsonFormat(pattern = VariableUtils.DATE_TIME_FORMAT)
-    protected LocalDateTime createdDate;
+    protected LocalDateTime createdAt;
 
     @LastModifiedDate
     @JsonFormat(pattern = VariableUtils.DATE_TIME_FORMAT)
-    protected LocalDateTime updatedDate;
+    protected LocalDateTime updatedAt;
 
 
     @CreatedBy

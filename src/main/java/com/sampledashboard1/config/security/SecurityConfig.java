@@ -47,7 +47,11 @@ public class SecurityConfig {
             "/app/**",
             "/users/",
             "/users/sendOtp",
-            "users/singUpGoogle"
+            "users/singUpGoogle",
+            "/forgotPwdSendEmail",
+            "/forgotPwdOtpVerification",
+            "/forgotPwd",
+            "master/CountriesDropdownFlag"
 
     };
     // @formatter:on

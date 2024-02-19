@@ -7,4 +7,5 @@ public interface LoginService {
     String forgotPwdOtpVerification(String email,String otp);
 
     String forgotPwd(String email,String password);
+    String changePwd(String crnPass, String pwd);
 }

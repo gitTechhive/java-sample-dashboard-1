@@ -1,16 +1,24 @@
 package com.sampledashboard1.service.serviceImpl;
 
+import com.sampledashboard1.config.security.jwt.JwtProvider;
 import com.sampledashboard1.exception.UserDefineException;
 import com.sampledashboard1.model.Login;
 import com.sampledashboard1.model.OtpVerification;
+import com.sampledashboard1.model.RefreshToken;
+import com.sampledashboard1.model.Users;
 import com.sampledashboard1.payload.request.MailRequest;
+import com.sampledashboard1.payload.response.LoginResponse;
 import com.sampledashboard1.repository.LoginRepository;
 import com.sampledashboard1.repository.OtpVerificationRepository;
+import com.sampledashboard1.repository.UsersRepository;
 import com.sampledashboard1.service.LoginService;
+import com.sampledashboard1.service.RefreshTokenService;
 import com.sampledashboard1.utils.MessageUtils;
 import com.sampledashboard1.utils.MethodUtils;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -25,10 +33,15 @@ public class LoginServiceImpl implements LoginService {
     private final EmailServiceImpl emailService;
     private final LoginRepository loginRepository;
     private final PasswordEncoder passwordEncoder;
+    private final RefreshTokenService refreshTokenService;
+    private final UsersRepository usersRepository;
+    private final UserDetailsService userDetailsService;
+    private final JwtProvider jwtProvider;
+
     @Override
     public String forgotPwdSendEmail(String email) {
         OtpVerification otpVerification = otpVerificationRepository.findByRequestValue(email);
-        if(otpVerification == null){
+        if (otpVerification == null) {
             throw new UserDefineException("Please enter registered email.");
         }
         String s = MethodUtils.generateRandomInteger(6);
@@ -40,7 +53,7 @@ public class LoginServiceImpl implements LoginService {
         emailService.sendEmail(MailRequest.builder()
                 .to(email)
                 .subject("SampleDashBoard Verify Email")
-                .body("Your Request Id Is : "+string + "And  OTP Is : " + s)
+                .body("Your Request Id Is : " + string + "And  OTP Is : " + s)
                 .build());
         otpVerificationRepository.save(otpVerification);
         return "Please check mail.";
@@ -49,11 +62,11 @@ public class LoginServiceImpl implements LoginService {
     @Override
     public String forgotPwdOtpVerification(String email, String otp) {
         OtpVerification otpVerification = otpVerificationRepository.getDataByEmailOrOtp(email, otp);
-        if(otpVerification == null){
+        if (otpVerification == null) {
             throw new UserDefineException("Please enter valid otp.");
         }
         LocalDateTime currentDateTime = LocalDateTime.now();
-        if(otpVerification.getOtpExpiredOn().compareTo(currentDateTime) <= 0){
+        if (otpVerification.getOtpExpiredOn().compareTo(currentDateTime) <= 0) {
             throw new UserDefineException("Please Resend otp.");
         }
         return "OTP verify successfully";
@@ -78,4 +91,55 @@ public class LoginServiceImpl implements LoginService {
         loginRepository.save(login);
         return MessageUtils.get("login.service.change.pwd");
     }
+    @Override
+    public LoginResponse loginPhoneNo(String phoneNo, String otp) {
+
+        //otp verification
+        OtpVerification dataByPhoneNoOrOtp = otpVerificationRepository.getDataByPhoneNoOrOtp(phoneNo, otp);
+        if (dataByPhoneNoOrOtp == null) {
+            throw new UserDefineException("Invalid OTP");
+        }
+        //otp successfully then after
+        Users users1 = usersRepository.getUserByMobileNo(Long.valueOf(phoneNo)).orElseThrow(() -> new UserDefineException("Mobile Number not Found !"));
+
+
+        Login login = loginRepository.findById(users1.getLogin().getId()).orElseThrow(() -> new UserDefineException("user not found"));
+        UserDetails userDetails = userDetailsService.loadUserByUsername(login.getEmail());
+        String jwt = jwtProvider.generateToken(userDetails);
+        RefreshToken refreshToken = refreshTokenService.createRefreshToken(login.getId());
+
+        Users users = usersRepository.getUserByLoginId(login.getId()).orElse(null);
+        LoginResponse.LoginResponseBuilder responseBuilder = LoginResponse.builder()
+                .id(login.getId())
+                .token(jwt)
+                .refreshToken(refreshToken.getToken())
+                .email(login.getEmail());
+
+        if (!MethodUtils.isObjectisNullOrEmpty(users)) {
+            assert users != null;
+            responseBuilder.firstName(users.getFirstName())
+                    .userId(users.getId())
+                    .lastName(users.getLastName());
+        }
+        return  responseBuilder.build();
+    }
+
+    @Override
+    public String sendOtpLoginPhoneNo(String phoneNo) {
+
+        Users users1 = usersRepository.getUserByMobileNo(Long.valueOf(phoneNo)).orElseThrow(() -> new UserDefineException("Mobile Number not Found !"));
+        OtpVerification otpVerification=null;
+        OtpVerification dataByPhoneNo = otpVerificationRepository.getDataByPhoneNo(phoneNo);
+        if(dataByPhoneNo != null){
+            otpVerification=dataByPhoneNo;
+        }else{
+            otpVerification =new OtpVerification();
+        }
+        otpVerification.setRequestType("mobile");
+        //set static otp send  -> 12345
+        otpVerification.setOtp("12345");
+        otpVerificationRepository.save(otpVerification);
+        return "OTP Send Successfully";
+    }
+
 }

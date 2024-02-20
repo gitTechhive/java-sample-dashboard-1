@@ -74,6 +74,7 @@ public class LoginController {
                         .lastName(users.getLastName());
             }
             return ResponseWrapperDTO.successResponse(MessageUtils.get("login.controller.login"), responseBuilder.build(), httpServletRequest);
+       //login Google
         } else if(loginForm.getType().equals(EnumForLoginType.Google.value())){
 
             UserDetails userDetails = userDetailsService.loadUserByUsername(loginForm.getEmail());
@@ -110,6 +111,14 @@ public class LoginController {
 
         }
         return null;
+    }
+    @PostMapping("/loginPhoneNo")
+    public ResponseWrapperDTO loginPhoneNo(@Valid @RequestBody LoginPhoneNoRequest request, HttpServletRequest httpServletRequest) {
+        return ResponseWrapperDTO.successResponse(MessageUtils.get("login.controller.login"), loginService.loginPhoneNo(request.getPhoneNo(), request.getOtp()), httpServletRequest);
+    }
+    @GetMapping("/sendOtpLoginPhoneNo")
+    public ResponseWrapperDTO sendOtpLoginPhoneNo(@Valid @RequestParam String phoneNo, HttpServletRequest httpServletRequest) {
+        return ResponseWrapperDTO.successResponse("OTP Send Successfully", loginService.sendOtpLoginPhoneNo(phoneNo), httpServletRequest);
     }
 
     @PostMapping("refreshToken")

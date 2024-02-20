@@ -40,7 +40,6 @@ public class SecurityConfig {
             "/checkTokenActive",
             "/createPwd",
             "/refreshToken",
-            "/forgotPwd",
             "/getNaturalStock",
             "/getCVDStock",
             "/ws/**",
@@ -51,7 +50,9 @@ public class SecurityConfig {
             "/forgotPwdSendEmail",
             "/forgotPwdOtpVerification",
             "/forgotPwd",
-            "master/CountriesDropdownFlag"
+            "master/CountriesDropdownFlag",
+            "/loginPhoneNo",
+            "/sendOtpLoginPhoneNo"
 
     };
     // @formatter:on

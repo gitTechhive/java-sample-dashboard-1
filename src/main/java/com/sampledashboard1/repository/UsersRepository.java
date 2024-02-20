@@ -31,6 +31,7 @@ public interface UsersRepository  extends JpaRepository<Users, Long> {
             where u.login.id=:id
             """)
     Users getUsersData(Long id);
+    Optional<Users> getUserByMobileNo(Long mobilNo);
 
 
 }

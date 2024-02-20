@@ -6,16 +6,19 @@ import com.sampledashboard1.enums.EnumForLoginType;
 import com.sampledashboard1.exception.TokenRefreshException;
 import com.sampledashboard1.exception.UserDefineException;
 import com.sampledashboard1.filter.ResponseWrapperDTO;
+import com.sampledashboard1.model.Captcha;
 import com.sampledashboard1.model.Login;
 import com.sampledashboard1.model.RefreshToken;
 import com.sampledashboard1.model.Users;
 import com.sampledashboard1.payload.request.*;
 import com.sampledashboard1.payload.response.LoginResponse;
 import com.sampledashboard1.payload.response.TokenRefreshResponse;
+import com.sampledashboard1.repository.CaptchaRepository;
 import com.sampledashboard1.repository.LoginRepository;
 import com.sampledashboard1.repository.UsersRepository;
 import com.sampledashboard1.service.LoginService;
 import com.sampledashboard1.service.RefreshTokenService;
+import com.sampledashboard1.utils.CaptchaUtil;
 import com.sampledashboard1.utils.MessageUtils;
 import com.sampledashboard1.utils.MethodUtils;
 import jakarta.servlet.http.HttpServletRequest;
@@ -29,6 +32,8 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDateTime;
+
 @RestController
 @RequiredArgsConstructor
 @Validated
@@ -41,10 +46,25 @@ public class LoginController {
     private final LoginRepository loginRepository;
     private final UsersRepository usersRepository;
     private final LoginService loginService;
+    private final CaptchaRepository captchaRepository;
 
-
+    /**
+     * This API Used for Login (Two type Login 1) login to Email and password 2) login to Google )
+     * @param loginForm
+     * @param httpServletRequest
+     * @return
+     */
     @PostMapping("login")
     public ResponseWrapperDTO login(@RequestBody LoginRequest loginForm, HttpServletRequest httpServletRequest) {
+        Captcha dataByUID = captchaRepository.getDataByUID(loginForm.getUuid());
+        LocalDateTime currentDateTime = LocalDateTime.now();
+        int i = dataByUID.getExpiryTimestamp().compareTo(currentDateTime);
+        if(i<0 ){
+            throw new UserDefineException("Your Captcha Expire.");
+        }
+        if((Boolean.FALSE.equals( dataByUID.getIsVerified())) || dataByUID.getIsVerified() == null ){
+            throw new UserDefineException("Your Captcha Not Verified");
+        }
 
         if(loginForm.getType().equals(EnumForLoginType.EMAIL.value())){
             Authentication authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(loginForm.getEmail(), loginForm.getPassword()));
@@ -57,7 +77,6 @@ public class LoginController {
             if (Boolean.FALSE.equals(login.getIsActive())) {
                 throw new UserDefineException("User not active, Please contact admin");
             }
-
             RefreshToken refreshToken = refreshTokenService.createRefreshToken(login.getId());
 
             Users users = usersRepository.getUserByLoginId(login.getId()).orElse(null);
@@ -91,7 +110,6 @@ public class LoginController {
             if (Boolean.FALSE.equals(login.getIsActive())) {
                 throw new UserDefineException("User not active, Please contact admin");
             }
-
             RefreshToken refreshToken = refreshTokenService.createRefreshToken(login.getId());
 
             Users users = usersRepository.getUserByLoginId(login.getId()).orElse(null);
@@ -108,19 +126,38 @@ public class LoginController {
                         .lastName(users.getLastName());
             }
             return ResponseWrapperDTO.successResponse(MessageUtils.get("login.controller.login"), responseBuilder.build(), httpServletRequest);
-
         }
         return null;
     }
+
+    /**
+     * This API Used for Login (Login to phone number)
+     * @param request
+     * @param httpServletRequest
+     * @return
+     */
     @PostMapping("/loginPhoneNo")
     public ResponseWrapperDTO loginPhoneNo(@Valid @RequestBody LoginPhoneNoRequest request, HttpServletRequest httpServletRequest) {
         return ResponseWrapperDTO.successResponse(MessageUtils.get("login.controller.login"), loginService.loginPhoneNo(request.getPhoneNo(), request.getOtp()), httpServletRequest);
     }
+
+    /**
+     * This API Used for send OTP Login with Phone
+     * @param phoneNo
+     * @param httpServletRequest
+     * @return
+     */
     @GetMapping("/sendOtpLoginPhoneNo")
     public ResponseWrapperDTO sendOtpLoginPhoneNo(@Valid @RequestParam String phoneNo, HttpServletRequest httpServletRequest) {
         return ResponseWrapperDTO.successResponse("OTP Send Successfully", loginService.sendOtpLoginPhoneNo(phoneNo), httpServletRequest);
     }
 
+    /**
+     * This API Used for RefreshToken
+     * @param request
+     * @param httpServletRequest
+     * @return
+     */
     @PostMapping("refreshToken")
     public ResponseWrapperDTO refreshToken(@Valid @RequestBody TokenRefreshRequest request, HttpServletRequest httpServletRequest) {
 
@@ -179,8 +216,7 @@ public class LoginController {
      */
     @PostMapping("/changePwd")
     public ResponseWrapperDTO changePwd(@Valid @RequestBody ChangePassRequest request, HttpServletRequest httpServletRequest) {
-        String res = loginService.changePwd(request.getCrnPass(), request.getPwd());
+        String res = loginService.changePwd(request.getOldPassword(), request.getNewPassword());
         return ResponseWrapperDTO.successResponse(res, res, httpServletRequest);
     }
-
 }

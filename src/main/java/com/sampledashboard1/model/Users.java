@@ -3,14 +3,12 @@ package com.sampledashboard1.model;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.sampledashboard1.config.audit.Auditable;
-import com.sampledashboard1.utils.MethodUtils;
 import com.sampledashboard1.utils.VariableUtils;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import java.util.HashMap;
 import java.util.Map;
 
 @Entity

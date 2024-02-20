@@ -66,10 +66,16 @@ public class MethodUtils {
         }
         return (CustomUser) authentication.getPrincipal();
     }
+    public static String getCurrentUserName() {
+        CustomUser userPrincipal = getCurrentAuditor();
+        return userPrincipal == null ? "" : userPrincipal.getName();
+    }
+
     public static String getCurrentLoginId() {
         CustomUser userPrincipal = getCurrentAuditor();
         return userPrincipal == null ? "" : userPrincipal.getId().toString();
     }
+
     public static String getCurrentUserId() {
         CustomUser userPrincipal = getCurrentAuditor();
         return userPrincipal == null ? "" : userPrincipal.getCurrentUserId();

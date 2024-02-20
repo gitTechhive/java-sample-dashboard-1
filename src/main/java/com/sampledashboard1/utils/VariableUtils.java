@@ -19,6 +19,7 @@ public class VariableUtils {
     public static final String TABLE_NAME_FOR_USER_DOCS = "user_docs";
 
     public static final String TABLE_NAME_FOR_CITIES = "cities";
+    public static final String TABLE_NAME_FOR_CAPTCHA_VERIFICATION = "captcha_verification";
     /*** others */
 
     public static final String DATE_TIME_FORMAT = "yyyy-MM-dd'T'HH:mm:ss";

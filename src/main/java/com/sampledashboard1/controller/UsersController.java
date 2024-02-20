@@ -8,7 +8,6 @@ import com.sampledashboard1.model.UserDoc;
 import com.sampledashboard1.model.Users;
 import com.sampledashboard1.payload.request.MailRequest;
 import com.sampledashboard1.payload.request.SaveUsersRequest;
-import com.sampledashboard1.payload.request.SendOtpRequest;
 import com.sampledashboard1.payload.request.SignUpGoogleRequest;
 import com.sampledashboard1.repository.UserDocsRepository;
 import com.sampledashboard1.repository.UsersRepository;
@@ -27,7 +26,6 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.File;
 import java.io.IOException;
 import java.time.LocalDateTime;
-import java.time.YearMonth;
 
 
 @Validated
@@ -55,6 +53,12 @@ public class UsersController {
         return ResponseWrapperDTO.successResponse(MessageUtils.get("users.controller.save"), usersService.otpVerification(saveUsersData), httpServletRequest);
     }
 
+    /**
+     *
+     * @param request
+     * @param httpServletRequest
+     * @return
+     */
     @PostMapping("/singUpGoogle")
     public ResponseWrapperDTO singUpGoogle(@Valid @RequestBody SignUpGoogleRequest request,
                                            HttpServletRequest httpServletRequest) {
@@ -150,6 +154,7 @@ public class UsersController {
     public String welcome() {
         return "java-sample-dashboard-1 ";
     }
+    
     // string data convert SaveUsersRequest class
     private SaveUsersRequest convertJsonToUserRequest(String user) {
         SaveUsersRequest saveUsersRequest;

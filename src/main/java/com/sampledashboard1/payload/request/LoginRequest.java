@@ -18,6 +18,7 @@ public class LoginRequest {
     private Long mobileNo;
     private String type;
     private String googleId;
+    private String uuid;
 
 
 }

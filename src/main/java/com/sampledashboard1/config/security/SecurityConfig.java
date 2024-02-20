@@ -52,7 +52,10 @@ public class SecurityConfig {
             "/forgotPwd",
             "master/CountriesDropdownFlag",
             "/loginPhoneNo",
-            "/sendOtpLoginPhoneNo"
+            "/sendOtpLoginPhoneNo",
+            "captcha/generate",
+            "captcha/reGenerate",
+            "captcha/verification"
 
     };
     // @formatter:on

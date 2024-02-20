@@ -10,7 +10,7 @@ import lombok.Setter;
 @JsonInclude(JsonInclude.Include.NON_EMPTY)
 public class ChangePassRequest {
     @NotEmpty(message = "{changePass.crnPass.is.required}")
-    String crnPass;
+    String oldPassword;
     @NotEmpty(message = "{changePass.pwd.is.required}")
-    String pwd;
+    String newPassword ;
 }

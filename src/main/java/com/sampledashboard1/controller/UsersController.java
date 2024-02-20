@@ -54,7 +54,7 @@ public class UsersController {
     }
 
     /**
-     *
+     * This API Used For SingUp in Google
      * @param request
      * @param httpServletRequest
      * @return
@@ -93,8 +93,6 @@ public class UsersController {
      * @param file
      * @param saveUsersData
      * @param httpServletRequest
-     * @return
-     * @throws IOException
      */
     @PostMapping("/updateUser")
     public ResponseWrapperDTO updateUsers(@Valid @RequestParam(name = "profilePic", required = false) MultipartFile file
@@ -154,7 +152,7 @@ public class UsersController {
     public String welcome() {
         return "java-sample-dashboard-1 ";
     }
-    
+
     // string data convert SaveUsersRequest class
     private SaveUsersRequest convertJsonToUserRequest(String user) {
         SaveUsersRequest saveUsersRequest;

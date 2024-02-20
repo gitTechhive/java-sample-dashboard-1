@@ -35,7 +35,7 @@ public class CaptchaServiceImpl implements CaptchaService {
         LocalDateTime currentDateTime = LocalDateTime.now();
         newCaptcha.setExpiryTimestamp(currentDateTime.plusMinutes(1));
         captchaRepository.save(newCaptcha);
-        return new Captcha(newCaptcha.getHiddenCaptcha(),newCaptcha.getUuid(),newCaptcha.getRealCaptcha()) ;
+        return new Captcha(newCaptcha.getUuid(),newCaptcha.getRealCaptcha()) ;
     }
 
     @Override
@@ -53,7 +53,7 @@ public class CaptchaServiceImpl implements CaptchaService {
             LocalDateTime currentDateTime = LocalDateTime.now();
             newCaptcha.setExpiryTimestamp(currentDateTime.plusMinutes(1));
             captchaRepository.save(newCaptcha);
-            return new Captcha(newCaptcha.getHiddenCaptcha(),newCaptcha.getUuid(),newCaptcha.getRealCaptcha());
+            return new Captcha(newCaptcha.getUuid(),newCaptcha.getRealCaptcha());
         }else{
             throw new UserDefineException("UUId Not found !");
         }

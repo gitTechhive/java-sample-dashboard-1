@@ -66,7 +66,11 @@ public class LoginServiceImpl implements LoginService {
             throw new UserDefineException("Please enter valid otp.");
         }
         LocalDateTime currentDateTime = LocalDateTime.now();
-        if (otpVerification.getOtpExpiredOn().compareTo(currentDateTime) <= 0) {
+        int i = otpVerification.getOtpExpiredOn().compareTo(currentDateTime);
+//        if (otpVerification.getOtpExpiredOn().compareTo(currentDateTime) <= 0) {
+//            throw new UserDefineException("Please Resend otp.");
+//        }
+        if (i<0) {
             throw new UserDefineException("Please Resend otp.");
         }
         return "OTP verify successfully";

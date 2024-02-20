@@ -18,7 +18,6 @@ import com.sampledashboard1.repository.LoginRepository;
 import com.sampledashboard1.repository.UsersRepository;
 import com.sampledashboard1.service.LoginService;
 import com.sampledashboard1.service.RefreshTokenService;
-import com.sampledashboard1.utils.CaptchaUtil;
 import com.sampledashboard1.utils.MessageUtils;
 import com.sampledashboard1.utils.MethodUtils;
 import jakarta.servlet.http.HttpServletRequest;

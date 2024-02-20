@@ -31,8 +31,7 @@ public class Captcha extends Auditable<Long> {
     @Transient
     private String realCaptcha;
 
-    public Captcha(String hiddenCaptcha, String uuid, String realCaptcha) {
-        this.hiddenCaptcha=hiddenCaptcha;
+    public Captcha( String uuid, String realCaptcha) {
         this.uuid=uuid;
         this.realCaptcha=realCaptcha;
     }

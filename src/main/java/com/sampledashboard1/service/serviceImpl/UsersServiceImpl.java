@@ -121,7 +121,7 @@ public class UsersServiceImpl implements UsersService {
 
             Optional<Login> byEmail = loginRepository.findByEmail(request.getEmail());
             if(!byEmail.isEmpty()){
-                throw new UserDefineException("Email already registered.");
+                throw new UserDefineException(MessageUtils.get("users.validation.email"));
             }
 
             Login login=new Login();

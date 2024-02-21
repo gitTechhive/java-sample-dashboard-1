@@ -56,7 +56,7 @@ public class LoginServiceImpl implements LoginService {
                 .body("Your Request Id Is : " + string + "And  OTP Is : " + s)
                 .build());
         otpVerificationRepository.save(otpVerification);
-        return "Please check mail.";
+        return MessageUtils.get("login.service.email");
     }
 
     @Override

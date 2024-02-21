@@ -26,6 +26,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.File;
 import java.io.IOException;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 
 
 @Validated
@@ -73,7 +74,7 @@ public class UsersController {
      */
     @PostMapping("send")
     public ResponseWrapperDTO sendEmail(@RequestBody MailRequest mailRequest, HttpServletRequest httpServletRequest) {
-        return ResponseWrapperDTO.successResponse("hello send done", emailService.sendEmail(mailRequest), httpServletRequest);
+        return ResponseWrapperDTO.successResponse("Send Email Successfully", emailService.sendEmail(mailRequest), httpServletRequest);
     }
 
     /**
@@ -116,19 +117,16 @@ public class UsersController {
             userDoc.setUrl(filePath);
             userDoc.setOriginalName(file.getOriginalFilename());
             LocalDateTime currentDateTime = LocalDateTime.now();
-            String year = String.valueOf(currentDateTime.getYear());
-            String month = String.valueOf(currentDateTime.getMonthValue());
-            String day = String.valueOf(currentDateTime.getDayOfMonth());
-            String hour = String.valueOf(currentDateTime.getHour());
-            String minute = String.valueOf(currentDateTime.getMinute());
-            String second = String.valueOf(currentDateTime.getSecond());
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMdd_HHmmss");
+            String formattedDateTime = currentDateTime.format(formatter);
 
             String fileExtension = "";
             int dotIndex = file.getOriginalFilename().lastIndexOf('.');
             if (dotIndex != -1 && dotIndex < file.getOriginalFilename().length() - 1) {
                 fileExtension = file.getOriginalFilename().substring(dotIndex + 1);
             }
-            String s = year+month+day + "_" + hour + minute + second + "_" + MethodUtils.generateRandomStringOnlyAlphabet(5) + "." + fileExtension;
+            //String s = year+month+day + "_" + hour + minute + second + "_" + MethodUtils.generateRandomStringOnlyAlphabet(5) + "." + fileExtension;
+            String s = formattedDateTime + "_" + MethodUtils.generateRandomStringOnlyAlphabet(5) + "." + fileExtension;
             userDoc.setFormattedName(s);
             userDoc.setUser(users);
             userDocsRepository.save(userDoc);

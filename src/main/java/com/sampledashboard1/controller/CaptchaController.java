@@ -2,6 +2,7 @@ package com.sampledashboard1.controller;
 
 import com.sampledashboard1.filter.ResponseWrapperDTO;
 import com.sampledashboard1.service.CaptchaService;
+import com.sampledashboard1.utils.MessageUtils;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.validation.annotation.Validated;
@@ -25,7 +26,7 @@ public class CaptchaController {
      */
     @GetMapping("/generate")
     public ResponseWrapperDTO generateCaptcha( HttpServletRequest httpServletRequest) {
-        return ResponseWrapperDTO.successResponse("Generate Captcha", captchaService.generateCaptcha(), httpServletRequest);
+        return ResponseWrapperDTO.successResponse(MessageUtils.get("captcha.controller.generateCaptcha"), captchaService.generateCaptcha(), httpServletRequest);
     }
 
     /**
@@ -36,7 +37,7 @@ public class CaptchaController {
      */
     @GetMapping("/reGenerate")
     public ResponseWrapperDTO reGenerateCaptcha(@RequestParam String uuId, HttpServletRequest httpServletRequest) {
-        return ResponseWrapperDTO.successResponse("Generate Captcha", captchaService.reGenerateCaptcha(uuId), httpServletRequest);
+        return ResponseWrapperDTO.successResponse(MessageUtils.get("captcha.controller.generateCaptcha"), captchaService.reGenerateCaptcha(uuId), httpServletRequest);
     }
 
     /**
@@ -48,6 +49,6 @@ public class CaptchaController {
      */
     @GetMapping("/verification")
     public ResponseWrapperDTO verificationCaptcha(@RequestParam String uuId,@RequestParam String hiddenCaptcha, HttpServletRequest httpServletRequest) {
-        return ResponseWrapperDTO.successResponse("Captcha Verification Successfully", captchaService.verificationCaptcha(uuId,hiddenCaptcha), httpServletRequest);
+        return ResponseWrapperDTO.successResponse(MessageUtils.get("captcha.controller.verificationCaptcha"), captchaService.verificationCaptcha(uuId,hiddenCaptcha), httpServletRequest);
     }
 }

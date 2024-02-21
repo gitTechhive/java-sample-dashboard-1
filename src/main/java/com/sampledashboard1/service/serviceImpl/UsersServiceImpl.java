@@ -18,7 +18,6 @@ import com.sampledashboard1.utils.MethodUtils;
 import com.sampledashboard1.validation.UsersValidation;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
-import org.apache.catalina.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -36,8 +35,6 @@ public class UsersServiceImpl implements UsersService {
     private final UsersValidation usersValidation;
     private final PasswordEncoder passwordEncoder;
     private final EmailServiceImpl emailService;
-    private final AppConstantRepository appConstantRepository;
-    private final OtpVerificationService otpVerificationService;
     private final OtpVerificationRepository otpVerificationRepository;
     private final CustomUserDetailsService userDetailsService;
     private final JwtProvider jwtProvider;
@@ -177,7 +174,7 @@ public class UsersServiceImpl implements UsersService {
         loginRepository.save(login);
         usersRepository.save(users);
 
-        return "User Update Successfully.";
+        return MessageUtils.get("users.controller.update");
     }
 
     @Override

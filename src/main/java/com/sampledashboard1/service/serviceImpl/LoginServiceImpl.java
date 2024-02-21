@@ -73,7 +73,7 @@ public class LoginServiceImpl implements LoginService {
         if (i<0) {
             throw new UserDefineException("Please Resend otp.");
         }
-        return "OTP verify successfully";
+        return MessageUtils.get("login.service.val.OtpVerification");
     }
 
     @Override
@@ -81,7 +81,7 @@ public class LoginServiceImpl implements LoginService {
         Login login = loginRepository.findByEmail(email).orElseThrow(() -> new UserDefineException(MessageUtils.get("login.service.val.registered.email")));
         login.setPassword(passwordEncoder.encode(password));
         loginRepository.save(login);
-        return "password save successfully";
+        return MessageUtils.get("login.service.change.pwd");
     }
     @Override
     @Transactional
@@ -143,7 +143,7 @@ public class LoginServiceImpl implements LoginService {
         //set static otp send  -> 12345
         otpVerification.setOtp("12345");
         otpVerificationRepository.save(otpVerification);
-        return "OTP Send Successfully";
+        return MessageUtils.get("login.service.val.OtpSend");
     }
 
 }

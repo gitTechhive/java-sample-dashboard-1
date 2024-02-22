@@ -4,6 +4,7 @@ import com.sampledashboard1.model.Login;
 import com.sampledashboard1.utils.MethodUtils;
 import lombok.NoArgsConstructor;
 import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import java.io.Serial;
@@ -30,25 +31,27 @@ public class CustomUser extends Login implements UserDetails {
 
     private Collection<? extends GrantedAuthority> authorities;
 
-    public CustomUser(Long id, String email, String password, String name, String currentUserId, Collection<? extends GrantedAuthority> authorities) {
+    public CustomUser(Long id, String email, String password, String name, String currentUserId, Collection<? extends GrantedAuthority> authorities,String roleType) {
         this.id = id;
         this.email = email;
         this.password = password;
         this.firstName = name;
         this.currentUserId = currentUserId;
         this.authorities = authorities;
+        this.roleType=roleType;
     }
 
     public static CustomUser build(Login login) {
         Set<GrantedAuthority> authorities = new HashSet<>();
-       // authorities.add(new SimpleGrantedAuthority(login.getRole().getName()));
+        authorities.add(new SimpleGrantedAuthority("ROLE_USER"));
         String username = "";
         String userId = "";
+        String roleType="ROLE_USER";
         if (!MethodUtils.isObjectisNullOrEmpty(login.getUsers())) {
             username = login.getUsers().getFirstName();
             userId = login.getUsers().getId().toString();
         }
-        return new CustomUser(login.getId(), login.getEmail(), login.getPassword(), username, userId, authorities);
+        return new CustomUser(login.getId(), login.getEmail(), login.getPassword(), username, userId, authorities,roleType);
     }
 
     public Long getId() {

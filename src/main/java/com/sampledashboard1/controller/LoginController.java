@@ -67,6 +67,13 @@ public class LoginController {
 
         if(loginForm.getType().equals(EnumForLoginType.EMAIL.value())){
             Authentication authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(loginForm.getEmail(), loginForm.getPassword()));
+
+            /*if (authentication.getAuthorities().isEmpty()) {
+                List<GrantedAuthority> authorities = new ArrayList<>();
+                authorities.add(new SimpleGrantedAuthority("ROLE_USER")); // Set the default role here
+                authentication = new UsernamePasswordAuthenticationToken(authentication.getPrincipal(), authentication.getCredentials(), authorities);
+            }*/
+
             SecurityContextHolder.getContext().setAuthentication(authentication);
 
             UserDetails userDetails = userDetailsService.loadUserByUsername(loginForm.getEmail());

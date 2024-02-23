@@ -2,10 +2,12 @@ package com.sampledashboard1.service.serviceImpl;
 
 import com.sampledashboard1.config.security.CustomUserDetailsService;
 import com.sampledashboard1.exception.UserDefineException;
+import com.sampledashboard1.model.Captcha;
 import com.sampledashboard1.model.OtpVerification;
 import com.sampledashboard1.payload.request.MailRequest;
 import com.sampledashboard1.payload.request.SaveUsersRequest;
 import com.sampledashboard1.payload.request.SendOtpRequest;
+import com.sampledashboard1.repository.CaptchaRepository;
 import com.sampledashboard1.repository.OtpVerificationRepository;
 import com.sampledashboard1.service.OtpVerificationService;
 import com.sampledashboard1.utils.MethodUtils;
@@ -14,6 +16,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -26,9 +29,19 @@ public class OtpVerificationServiceImpl implements OtpVerificationService {
     private final UsersValidation usersValidation;
 
     private final OtpVerificationRepository otpVerificationRepository;
+    private final CaptchaRepository captchaRepository;
 
     @Override
     public OtpVerification sendOtp(SaveUsersRequest sendOtpRequest) {
+        Captcha dataByUID = captchaRepository.getDataByUID(sendOtpRequest.getUuid());
+        LocalDateTime currentDateTime = LocalDateTime.now();
+        int i = dataByUID.getExpiryTimestamp().compareTo(currentDateTime);
+        if(i<0 ){
+            throw new UserDefineException("Your Captcha Expire.");
+        }
+        if((Boolean.FALSE.equals( dataByUID.getIsVerified())) || dataByUID.getIsVerified() == null ){
+            throw new UserDefineException("Your Captcha Not Verified");
+        }
         OtpVerification otpVerification = null ;
         if(sendOtpRequest != null && ( !sendOtpRequest.getEmail().isEmpty() ||sendOtpRequest.getEmail() != null)){
             usersValidation.checkEmailIsExits(sendOtpRequest.getEmail(), null);

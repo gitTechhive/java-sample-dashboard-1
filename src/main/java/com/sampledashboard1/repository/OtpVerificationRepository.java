@@ -14,9 +14,9 @@ public interface OtpVerificationRepository extends JpaRepository<OtpVerification
 
     @Query("""
             select o from OtpVerification o 
-            where o.requestId=:requestId
+            where o.requestId=:requestId and o.otp=:otp
             """)
-    OtpVerification getDataByUId(String requestId);
+    OtpVerification getDataByUId(String requestId,String otp);
 
    OtpVerification findByRequestValue(String email);
     @Query("""

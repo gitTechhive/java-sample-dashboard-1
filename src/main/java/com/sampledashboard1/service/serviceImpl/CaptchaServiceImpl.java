@@ -61,7 +61,7 @@ public class CaptchaServiceImpl implements CaptchaService {
 
     @Override
     public String verificationCaptcha(String uuid, String hiddenCaptcha) {
-        Captcha captcha = captchaRepository.getDataByUIdAndHiddenCaptcha(uuid,hiddenCaptcha);
+         Captcha captcha = captchaRepository.getDataByUIdAndHiddenCaptcha(uuid,hiddenCaptcha);
         if(captcha != null){
             LocalDateTime currentDateTime = LocalDateTime.now();
             int i = captcha.getExpiryTimestamp().compareTo(currentDateTime);

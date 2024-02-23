@@ -154,8 +154,8 @@ public class LoginController {
      * @return
      */
     @GetMapping("/sendOtpLoginPhoneNo")
-    public ResponseWrapperDTO sendOtpLoginPhoneNo(@Valid @RequestParam String phoneNo, HttpServletRequest httpServletRequest) {
-        return ResponseWrapperDTO.successResponse("OTP Send Successfully", loginService.sendOtpLoginPhoneNo(phoneNo), httpServletRequest);
+    public ResponseWrapperDTO sendOtpLoginPhoneNo(@Valid @RequestParam String phoneNo, @RequestParam String uuid, @RequestParam String countryCode, HttpServletRequest httpServletRequest) {
+        return ResponseWrapperDTO.successResponse("OTP Send Successfully", loginService.sendOtpLoginPhoneNo(phoneNo,uuid,countryCode), httpServletRequest);
     }
 
     /**

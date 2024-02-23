@@ -23,6 +23,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 
+import java.time.LocalDateTime;
 import java.util.Optional;
 
 @Service
@@ -42,6 +43,7 @@ public class UsersServiceImpl implements UsersService {
     private final StatesRepository statesRepository;
     private final CitiesRepository citiesRepository;
     private final UserDocsRepository userDocsRepository;
+    private final CaptchaRepository captchaRepository;
     public void validationForSaveUsers(SaveUsersRequest request) {
         if (request != null && request.getId() != null) {
             usersValidation.checkEmailIsExits(request.getEmail(), request.getId());
@@ -71,7 +73,7 @@ public class UsersServiceImpl implements UsersService {
     @Transactional
     public OtpVerificationResponse otpVerification(SaveUsersRequest request) {
 
-        Boolean flag = validationForSaveUsers(request.getRequestId());
+        Boolean flag = validationForSaveUsers(request.getRequestId(),request.getOtp());
 
         if (Boolean.FALSE.equals(flag)) {
             throw new UserDefineException("OTP Invalid");
@@ -114,6 +116,16 @@ public class UsersServiceImpl implements UsersService {
 
     @Override
     public SignUpGoogleResponse signUpGoogle(SignUpGoogleRequest request) {
+
+        Captcha dataByUID = captchaRepository.getDataByUID(request.getUuid());
+        LocalDateTime currentDateTime = LocalDateTime.now();
+        int i = dataByUID.getExpiryTimestamp().compareTo(currentDateTime);
+        if(i<0 ){
+            throw new UserDefineException("Your Captcha Expire.");
+        }
+        if((Boolean.FALSE.equals( dataByUID.getIsVerified())) || dataByUID.getIsVerified() == null ){
+            throw new UserDefineException("Your Captcha Not Verified");
+        }
         if(request != null && (request.getEmail() != null|| !request.getEmail().isEmpty())){
 
             Optional<Login> byEmail = loginRepository.findByEmail(request.getEmail());
@@ -184,9 +196,9 @@ public class UsersServiceImpl implements UsersService {
         return user;
     }
 
-    public Boolean validationForSaveUsers( String requestId) {
+    public Boolean validationForSaveUsers( String requestId,String otp) {
         Boolean flag = false;
-        OtpVerification dataByEmailOrOtpAndUId = otpVerificationRepository.getDataByUId(requestId);
+        OtpVerification dataByEmailOrOtpAndUId = otpVerificationRepository.getDataByUId(requestId,otp);
         if(dataByEmailOrOtpAndUId != null){
             flag = true;
         }

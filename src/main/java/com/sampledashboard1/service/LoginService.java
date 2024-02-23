@@ -12,5 +12,5 @@ public interface LoginService {
     String changePwd(String crnPass, String pwd);
     LoginResponse loginPhoneNo(String phoneNo, String otp);
 
-    String sendOtpLoginPhoneNo(String phoneNo);
+    String sendOtpLoginPhoneNo(String phoneNo,String uuid,String code);
 }

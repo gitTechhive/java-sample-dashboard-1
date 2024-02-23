@@ -2,12 +2,10 @@ package com.sampledashboard1.service.serviceImpl;
 
 import com.sampledashboard1.config.security.jwt.JwtProvider;
 import com.sampledashboard1.exception.UserDefineException;
-import com.sampledashboard1.model.Login;
-import com.sampledashboard1.model.OtpVerification;
-import com.sampledashboard1.model.RefreshToken;
-import com.sampledashboard1.model.Users;
+import com.sampledashboard1.model.*;
 import com.sampledashboard1.payload.request.MailRequest;
 import com.sampledashboard1.payload.response.LoginResponse;
+import com.sampledashboard1.repository.CaptchaRepository;
 import com.sampledashboard1.repository.LoginRepository;
 import com.sampledashboard1.repository.OtpVerificationRepository;
 import com.sampledashboard1.repository.UsersRepository;
@@ -37,6 +35,7 @@ public class LoginServiceImpl implements LoginService {
     private final UsersRepository usersRepository;
     private final UserDetailsService userDetailsService;
     private final JwtProvider jwtProvider;
+    private final CaptchaRepository captchaRepository;
 
     @Override
     public String forgotPwdSendEmail(String email) {
@@ -129,7 +128,16 @@ public class LoginServiceImpl implements LoginService {
     }
 
     @Override
-    public String sendOtpLoginPhoneNo(String phoneNo) {
+    public String sendOtpLoginPhoneNo(String phoneNo,String uuid,String code) {
+        Captcha dataByUID = captchaRepository.getDataByUID(uuid);
+        LocalDateTime currentDateTime = LocalDateTime.now();
+        int i = dataByUID.getExpiryTimestamp().compareTo(currentDateTime);
+        if(i<0 ){
+            throw new UserDefineException("Your Captcha Expire.");
+        }
+        if((Boolean.FALSE.equals( dataByUID.getIsVerified())) || dataByUID.getIsVerified() == null ){
+            throw new UserDefineException("Your Captcha Not Verified");
+        }
 
         Users users1 = usersRepository.getUserByMobileNo(Long.valueOf(phoneNo)).orElseThrow(() -> new UserDefineException("Mobile Number not Found !"));
         OtpVerification otpVerification=null;
@@ -140,8 +148,9 @@ public class LoginServiceImpl implements LoginService {
             otpVerification =new OtpVerification();
         }
         otpVerification.setRequestType("mobile");
+        otpVerification.setRequestValue(phoneNo);
         //set static otp send  -> 12345
-        otpVerification.setOtp("12345");
+        otpVerification.setOtp("123456");
         otpVerificationRepository.save(otpVerification);
         return MessageUtils.get("login.service.val.OtpSend");
     }

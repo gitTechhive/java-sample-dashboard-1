@@ -15,4 +15,5 @@ public class SpringSecurityAuditAwareImpl implements AuditorAware<Long> {
     public Optional<Long> getCurrentAuditor() {
         String currentLoginId = MethodUtils.getCurrentUserId();
         return Optional.of(MethodUtils.isObjectisNullOrEmpty(currentLoginId) ? 0L : Long.parseLong(currentLoginId));
+    }
 }

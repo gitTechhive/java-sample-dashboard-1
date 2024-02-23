@@ -12,15 +12,15 @@ import lombok.Setter;
 @JsonInclude(JsonInclude.Include.NON_EMPTY)
 public class SaveUsersRequest {
     private Long id;
-    @NotEmpty(message = "{users.firstName.is.required}")
+  //  @NotEmpty(message = "{users.firstName.is.required}")
     private String firstName;
-    @NotEmpty(message = "{users.lastName.is.required}")
+    //@NotEmpty(message = "{users.lastName.is.required}")
     private String lastName;
     private String address;
     private String pinCode;
-    @Email(message = "{users.email.is.required}")
+   // @Email(message = "{users.email.is.required}")
     private String email;
-    @NotNull(message = "{users.mobileNo.is.required}")
+   // @NotNull(message = "{users.mobileNo.is.required}")
     private Long mobileNo;
    // @NotNull(message = "{users.otp.is.required}")
     private String otp;
@@ -31,4 +31,5 @@ public class SaveUsersRequest {
     private Long state_id;
     private String bio;
     private String phonecode;
+    private String uuid;
 }

@@ -52,7 +52,8 @@ public class SecurityConfig {
             "/sendOtpLoginPhoneNo",
             "captcha/generate",
             "captcha/reGenerate",
-            "captcha/verification"
+            "captcha/verification",
+            "charts/"
 
     };
     // @formatter:on

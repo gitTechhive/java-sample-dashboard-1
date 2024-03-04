@@ -116,7 +116,9 @@ public class UsersServiceImpl implements UsersService {
 
     @Override
     public SignUpGoogleResponse signUpGoogle(SignUpGoogleRequest request) {
-
+        if(MethodUtils.isObjectisNullOrEmpty(request.getUuid())){
+            throw new UserDefineException("uuid not found !");
+        }
         Captcha dataByUID = captchaRepository.getDataByUID(request.getUuid());
         LocalDateTime currentDateTime = LocalDateTime.now();
         int i = dataByUID.getExpiryTimestamp().compareTo(currentDateTime);
@@ -198,6 +200,9 @@ public class UsersServiceImpl implements UsersService {
 
     public Boolean validationForSaveUsers( String requestId,String otp) {
         Boolean flag = false;
+        if((MethodUtils.isObjectisNullOrEmpty(requestId) || MethodUtils.isObjectisNullOrEmpty(otp))){
+            throw new UserDefineException("data messing !");
+        }
         OtpVerification dataByEmailOrOtpAndUId = otpVerificationRepository.getDataByUId(requestId,otp);
         if(dataByEmailOrOtpAndUId != null){
             flag = true;

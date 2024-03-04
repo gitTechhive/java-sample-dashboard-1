@@ -55,6 +55,9 @@ public class LoginController {
      */
     @PostMapping("login")
     public ResponseWrapperDTO login(@RequestBody LoginRequest loginForm, HttpServletRequest httpServletRequest) {
+        if(MethodUtils.isObjectisNullOrEmpty(loginForm.getUuid())){
+            throw new UserDefineException("uuid not found !");
+        }
         Captcha dataByUID = captchaRepository.getDataByUID(loginForm.getUuid());
         LocalDateTime currentDateTime = LocalDateTime.now();
         int i = dataByUID.getExpiryTimestamp().compareTo(currentDateTime);

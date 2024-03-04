@@ -6,6 +6,7 @@ import com.sampledashboard1.model.Login;
 import com.sampledashboard1.repository.CaptchaRepository;
 import com.sampledashboard1.service.CaptchaService;
 import com.sampledashboard1.utils.CaptchaUtil;
+import com.sampledashboard1.utils.MethodUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.data.jpa.repository.Modifying;
@@ -40,6 +41,9 @@ public class CaptchaServiceImpl implements CaptchaService {
 
     @Override
     public Captcha reGenerateCaptcha(String uuid) {
+        if(MethodUtils.isObjectisNullOrEmpty(uuid)){
+            throw new UserDefineException("uuid not found !");
+        }
         Captcha dataByUID = captchaRepository.getDataByUID(uuid);
 
         if(dataByUID != null){
@@ -61,6 +65,9 @@ public class CaptchaServiceImpl implements CaptchaService {
 
     @Override
     public String verificationCaptcha(String uuid, String hiddenCaptcha) {
+        if(((MethodUtils.isObjectisNullOrEmpty(uuid)) || MethodUtils.isObjectisNullOrEmpty(hiddenCaptcha))){
+           throw new UserDefineException("data messing !");
+        }
          Captcha captcha = captchaRepository.getDataByUIdAndHiddenCaptcha(uuid,hiddenCaptcha);
         if(captcha != null){
             LocalDateTime currentDateTime = LocalDateTime.now();

@@ -32,4 +32,5 @@ public class SaveUsersRequest {
     private String bio;
     private String phonecode;
     private String uuid;
+    private String profilePicUrl;
 }

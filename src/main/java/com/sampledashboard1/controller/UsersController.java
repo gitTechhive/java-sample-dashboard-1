@@ -96,43 +96,48 @@ public class UsersController {
      * @param httpServletRequest
      */
     @PostMapping("/updateUser")
-    public ResponseWrapperDTO updateUsers(@Valid @RequestParam(name = "profilePic", required = false) MultipartFile file
-            , @RequestParam(name = "userInfo") String saveUsersData,
+    public ResponseWrapperDTO updateUsers(@Valid @RequestParam(name = "profilePic", required = false) MultipartFile file,
+                                          @RequestParam(name = "userInfo") String saveUsersData,
                                           HttpServletRequest httpServletRequest) throws IOException {
-        Long userIdByToken = Long.valueOf(MethodUtils.getCurrentUserId());
-        Users users = usersRepository.findById(userIdByToken).orElseThrow(() -> new UserDefineException("User not found"));
-        UserDoc userDoc = null;
-        userDoc = userDocsRepository.findByUserId(userIdByToken);
-        if((file == null || file.isEmpty()) && userDoc != null){
-            usersService.deleteUserDoc(userIdByToken);
-        }else{
-            byte[] bytes = file.getBytes();
-            String filePath = UPLOAD_DIR + File.separator + file.getOriginalFilename();
-            File uploadedFile = new File(filePath);
-            file.transferTo(uploadedFile);
 
-            if (userDoc == null) {
-                userDoc = new UserDoc();
-            }
-            userDoc.setUrl(filePath);
-            userDoc.setOriginalName(file.getOriginalFilename());
-            LocalDateTime currentDateTime = LocalDateTime.now();
-            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMdd_HHmmss");
-            String formattedDateTime = currentDateTime.format(formatter);
-
-            String fileExtension = "";
-            int dotIndex = file.getOriginalFilename().lastIndexOf('.');
-            if (dotIndex != -1 && dotIndex < file.getOriginalFilename().length() - 1) {
-                fileExtension = file.getOriginalFilename().substring(dotIndex + 1);
-            }
-            //String s = year+month+day + "_" + hour + minute + second + "_" + MethodUtils.generateRandomStringOnlyAlphabet(5) + "." + fileExtension;
-            String s = formattedDateTime + "_" + MethodUtils.generateRandomStringOnlyAlphabet(5) + "." + fileExtension;
-            userDoc.setFormattedName(s);
-            userDoc.setUser(users);
-            userDocsRepository.save(userDoc);
-        }
         SaveUsersRequest saveUsersRequest = convertJsonToUserRequest(saveUsersData);
-        return ResponseWrapperDTO.successResponse(MessageUtils.get("users.controller.update"), usersService.updateUsers(saveUsersRequest), httpServletRequest);
+        Long userIdByToken = Long.valueOf(MethodUtils.getCurrentUserId());
+        Users users = usersRepository.findById(userIdByToken)
+                .orElseThrow(() -> new UserDefineException("User not found"));
+        UserDoc userDoc = userDocsRepository.findByUserId(userIdByToken);
+
+        if (file != null && !file.isEmpty()) {
+           this.handleFile(file, userIdByToken, userDoc);
+        } else if (userDoc != null && saveUsersRequest.getProfilePicUrl() == null) {
+            usersService.deleteUserDoc(userIdByToken);
+        }
+
+        return ResponseWrapperDTO.successResponse(MessageUtils.get("users.controller.update"),
+                usersService.updateUsers(saveUsersRequest), httpServletRequest);
+    }
+
+    private void handleFile(MultipartFile file, Long userIdByToken, UserDoc userDoc) throws IOException {
+        if (userDoc != null) {
+            usersService.deleteUserDoc(userIdByToken);
+        }
+
+        String filePath = UPLOAD_DIR + File.separator + file.getOriginalFilename();
+        File uploadedFile = new File(filePath);
+        file.transferTo(uploadedFile);
+
+        if (userDoc == null) {
+            userDoc = new UserDoc();
+        }
+        userDoc.setUrl(filePath);
+        userDoc.setOriginalName(file.getOriginalFilename());
+        LocalDateTime currentDateTime = LocalDateTime.now();
+        String formattedDateTime = currentDateTime.format(DateTimeFormatter.ofPattern("yyyyMMdd_HHmmss"));
+
+        String fileExtension = file.getOriginalFilename().substring(file.getOriginalFilename().lastIndexOf('.') + 1);
+        String s = formattedDateTime + "_" + MethodUtils.generateRandomStringOnlyAlphabet(5) + "." + fileExtension;
+        userDoc.setFormattedName(s);
+        userDoc.setUser(usersRepository.getOne(userIdByToken));
+        userDocsRepository.save(userDoc);
     }
 
     /**
@@ -150,8 +155,6 @@ public class UsersController {
     public String welcome() {
         return "java-sample-dashboard-1 ";
     }
-
-    // string data convert SaveUsersRequest class
     private SaveUsersRequest convertJsonToUserRequest(String user) {
         SaveUsersRequest saveUsersRequest;
         try {

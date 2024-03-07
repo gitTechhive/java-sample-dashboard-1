@@ -21,8 +21,8 @@ public interface UsersRepository  extends JpaRepository<Users, Long> {
     Optional<Users> getUserByLoginId(Long id);
 
     @Query("""
-            select new Users(u.id,u.firstName,u.lastName,u.address,u.pinCode,u.mobileNo,u.bio,u.type,u.phoneCode,c.name,
-                               s.name,ci.name,l.email,ud.url) from Users u
+            select new Users(u.id,u.firstName,u.lastName,u.address,u.pinCode,u.mobileNo,u.bio,u.type,u.phonecode,c.id,
+                               s.id,ci.id,l.email,ud.url) from Users u
             left join Countries c on c.id=u.country.id
             left join States s on s.id=u.state.id
             left join Cities ci on  ci.id=u.cities.id

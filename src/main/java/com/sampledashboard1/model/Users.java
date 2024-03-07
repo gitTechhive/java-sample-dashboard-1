@@ -33,7 +33,7 @@ public class Users  extends Auditable<Long> {
     private Long mobileNo;
     private String bio;
     private String type;
-    private String phoneCode;
+    private String phonecode;
 
 
     /**
@@ -61,11 +61,11 @@ public class Users  extends Auditable<Long> {
     @Transient
     private Map<String, Object> otherData;
     @Transient
-    private String country_id; ;
+    private Long country_id; ;
     @Transient
-    private String state_id;
+    private Long state_id;
     @Transient
-    private String cities_id;
+    private Long cities_id;
     @Transient
     private String url;
     @Transient
@@ -88,7 +88,7 @@ public class Users  extends Auditable<Long> {
     }
     //UsersRepository :getUsersData
     public Users(Long id,String firstName, String lastName,String address,String pinCode,Long mobileNo,String bio,
-                 String type,String phoneCode,String country_id ,String states,String citie,String email,String urls) {
+                 String type,String phoneCode,Long country_id ,Long states,Long citie,String email,String urls) {
         this.id = id;
         this.firstName=firstName;
         this.lastName=lastName;
@@ -97,7 +97,7 @@ public class Users  extends Auditable<Long> {
         this.mobileNo=mobileNo;
         this.bio=bio;
         this.type=type;
-        this.phoneCode=phoneCode;
+        this.phonecode=phoneCode;
         this.country_id=country_id;
         this.state_id=states;
         this.cities_id=citie;

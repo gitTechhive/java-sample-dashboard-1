@@ -11,7 +11,6 @@ import com.sampledashboard1.payload.request.SignUpGoogleRequest;
 import com.sampledashboard1.payload.response.OtpVerificationResponse;
 import com.sampledashboard1.payload.response.SignUpGoogleResponse;
 import com.sampledashboard1.repository.*;
-import com.sampledashboard1.service.OtpVerificationService;
 import com.sampledashboard1.service.UsersService;
 import com.sampledashboard1.utils.MessageUtils;
 import com.sampledashboard1.utils.MethodUtils;
@@ -44,6 +43,7 @@ public class UsersServiceImpl implements UsersService {
     private final CitiesRepository citiesRepository;
     private final UserDocsRepository userDocsRepository;
     private final CaptchaRepository captchaRepository;
+
     public void validationForSaveUsers(SaveUsersRequest request) {
         if (request != null && request.getId() != null) {
             usersValidation.checkEmailIsExits(request.getEmail(), request.getId());
@@ -58,9 +58,9 @@ public class UsersServiceImpl implements UsersService {
         users.setFirstName(request.getFirstName());
         users.setLastName(request.getLastName());
         users.setAddress(request.getAddress());
-     //   users.setCountry(request.getCountry());
+        //   users.setCountry(request.getCountry());
         users.setPinCode(request.getPinCode());
-       // users.setState(request.getState());
+        // users.setState(request.getState());
         users.setMobileNo(request.getMobileNo());
         users.setLogin(login);
     }
@@ -73,7 +73,7 @@ public class UsersServiceImpl implements UsersService {
     @Transactional
     public OtpVerificationResponse otpVerification(SaveUsersRequest request) {
 
-        Boolean flag = validationForSaveUsers(request.getRequestId(),request.getOtp());
+        Boolean flag = validationForSaveUsers(request.getRequestId(), request.getOtp());
 
         if (Boolean.FALSE.equals(flag)) {
             throw new UserDefineException("OTP Invalid");
@@ -116,33 +116,33 @@ public class UsersServiceImpl implements UsersService {
 
     @Override
     public SignUpGoogleResponse signUpGoogle(SignUpGoogleRequest request) {
-        if(MethodUtils.isObjectisNullOrEmpty(request.getUuid())){
+        if (MethodUtils.isObjectisNullOrEmpty(request.getUuid())) {
             throw new UserDefineException("uuid not found !");
         }
         Captcha dataByUID = captchaRepository.getDataByUID(request.getUuid());
         LocalDateTime currentDateTime = LocalDateTime.now();
         int i = dataByUID.getExpiryTimestamp().compareTo(currentDateTime);
-        if(i<0 ){
+        if (i < 0) {
             throw new UserDefineException("Your Captcha Expire.");
         }
-        if((Boolean.FALSE.equals( dataByUID.getIsVerified())) || dataByUID.getIsVerified() == null ){
+        if ((Boolean.FALSE.equals(dataByUID.getIsVerified())) || dataByUID.getIsVerified() == null) {
             throw new UserDefineException("Your Captcha Not Verified");
         }
-        if(request != null && (request.getEmail() != null|| !request.getEmail().isEmpty())){
+        if (request != null && (request.getEmail() != null || !request.getEmail().isEmpty())) {
 
             Optional<Login> byEmail = loginRepository.findByEmail(request.getEmail());
-            if(!byEmail.isEmpty()){
+            if (!byEmail.isEmpty()) {
                 throw new UserDefineException(MessageUtils.get("users.validation.email"));
             }
 
-            Login login=new Login();
-            Users users =new Users();
+            Login login = new Login();
+            Users users = new Users();
 
             login.setEmail(request.getEmail());
             login.setGoogleId(request.getGoogleId());
             users.setFirstName(request.getFirstName());
             users.setLastName(request.getLastName());
-            if(request.getType().equals(EnumForLoginType.Google.value())){
+            if (request.getType().equals(EnumForLoginType.Google.value())) {
                 users.setType(EnumForLoginType.Google.value());
             }
             loginRepository.saveAndFlush(login);
@@ -157,7 +157,7 @@ public class UsersServiceImpl implements UsersService {
                     .lastName(users.getLastName())
                     .token(jwt)
                     .email(login.getEmail());
-            return  responseBuilder.build();
+            return responseBuilder.build();
         }
         return null;
     }
@@ -165,8 +165,13 @@ public class UsersServiceImpl implements UsersService {
     @Override
     @Transactional
     public String updateUsers(SaveUsersRequest request) {
+        if (request.getEmail() == null || request.getFirstName() == null || request.getLastName() == null
+                || request.getPhonecode() == null || request.getMobileNo() == null) {
+            throw new UserDefineException("some filed are required");
+        }
+
         Long userIdByToken = Long.valueOf(MethodUtils.getCurrentUserId());
-        Users users=usersRepository.findById(userIdByToken).orElseThrow(()-> new UserDefineException("User not found."));
+        Users users = usersRepository.findById(userIdByToken).orElseThrow(() -> new UserDefineException("User not found."));
         usersValidation.checkUserUpdateValidation(request, users.getId());
         users.setFirstName(request.getFirstName());
         users.setLastName(request.getLastName());
@@ -175,15 +180,21 @@ public class UsersServiceImpl implements UsersService {
         users.setMobileNo(request.getMobileNo());
         //Email update
         Login login = loginRepository.findById(users.getLogin().getId()).orElseThrow(() -> new UserDefineException("Login not found."));
-        login.setEmail(request.getEmail());
 
+        login.setEmail(request.getEmail());
+        users.setPhonecode(request.getPhonecode());
         users.setBio(request.getBio());
-        users.setPhoneCode(request.getPhonecode());
-        Countries countries = countriesRepository.findById(request.getCountry_id()).orElseThrow(() -> new UserDefineException("Countries not found."));
-        users.setCountry(countries);
-        States states = statesRepository.findById(request.getState_id()).orElseThrow(() -> new UserDefineException("State not found."));
+        Countries countries=null;
+        States states =null;
+        Cities cities = null;
+        if (request.getCountry_id() != null) {
+             countries = countriesRepository.findById(request.getCountry_id()).orElseThrow(() -> new UserDefineException("Countries not found."));
+            users.setCountry(countries);
+             states = statesRepository.findById(request.getState_id()).orElseThrow(() -> new UserDefineException("State not found."));
+             cities = citiesRepository.findById(request.getCities_id()).orElseThrow(() -> new UserDefineException("Cities not found."));
+        }
         users.setState(states);
-        Cities cities = citiesRepository.findById(request.getCities_id()).orElseThrow(() -> new UserDefineException("Cities not found."));
+        users.setCountry(countries);
         users.setCities(cities);
         loginRepository.save(login);
         usersRepository.save(users);
@@ -194,24 +205,25 @@ public class UsersServiceImpl implements UsersService {
     @Override
     public Users getUsers() {
         Long userIdByToken = Long.valueOf(MethodUtils.getCurrentUserId());
-        Users user=usersRepository.getUsersData(userIdByToken);
+        Users user = usersRepository.getUsersData(userIdByToken);
         return user;
     }
 
-    public Boolean validationForSaveUsers( String requestId,String otp) {
+    public Boolean validationForSaveUsers(String requestId, String otp) {
         Boolean flag = false;
-        if((MethodUtils.isObjectisNullOrEmpty(requestId) || MethodUtils.isObjectisNullOrEmpty(otp))){
+        if ((MethodUtils.isObjectisNullOrEmpty(requestId) || MethodUtils.isObjectisNullOrEmpty(otp))) {
             throw new UserDefineException("data messing !");
         }
-        OtpVerification dataByEmailOrOtpAndUId = otpVerificationRepository.getDataByUId(requestId,otp);
-        if(dataByEmailOrOtpAndUId != null){
+        OtpVerification dataByEmailOrOtpAndUId = otpVerificationRepository.getDataByUId(requestId, otp);
+        if (dataByEmailOrOtpAndUId != null) {
             flag = true;
         }
         return flag;
     }
+
     @Override
     @Transactional
-    public void deleteUserDoc( Long userId) {
+    public void deleteUserDoc(Long userId) {
         userDocsRepository.deleteUserDocByUserId(userId);
     }
 

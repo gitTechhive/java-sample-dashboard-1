@@ -32,7 +32,7 @@ public class MasterController {
      * @param httpServletRequest
      * @return
      */
-    @GetMapping("/CountriesDropdownFlag")
+    @GetMapping("/countryCodes")
     public ResponseWrapperDTO getCountriesDropdownFlag(HttpServletRequest httpServletRequest) {
 
         return ResponseWrapperDTO.successResponse(MessageUtils.get("master.controller.countriesDropdown"), masterService.getCountriesDropdownFlag(), httpServletRequest);

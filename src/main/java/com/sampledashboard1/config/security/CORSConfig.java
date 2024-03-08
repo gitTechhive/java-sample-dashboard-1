@@ -1,6 +1,7 @@
 package com.sampledashboard1.config.security;
 
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
@@ -15,7 +16,11 @@ public class CORSConfig implements WebMvcConfigurer {
                 .addMapping("/**")
                 .allowedOrigins("*")
                 .allowedHeaders("*")
-                .allowedMethods("*")
-                .exposedHeaders("Content-Disposition");
+             //   .allowedMethods("*")
+                .allowedMethods("GET", "POST", "PUT", "DELETE")
+                .exposedHeaders("Content-Disposition")
+                .allowedMethods(HttpMethod.GET.name(), HttpMethod.POST.name(), HttpMethod.PUT.name(), HttpMethod.DELETE.name()); // Allow only specific methods
+
+
     }
 }

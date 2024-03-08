@@ -188,7 +188,7 @@ public class LoginController {
      * @param httpServletRequest
      * @return
      */
-    @PostMapping("forgotPwdSendEmail")
+    @PostMapping("forgotPassOtpGeneratorAdmin")
     public ResponseWrapperDTO forgotPwdSendEmail(@RequestBody ForgotPassSendOtpRequest request, HttpServletRequest httpServletRequest) {
         String res = loginService.forgotPwdSendEmail(request.getEmail());
         return ResponseWrapperDTO.successResponse(res, res, httpServletRequest);
@@ -200,7 +200,7 @@ public class LoginController {
      * @param httpServletRequest
      * @return
      */
-    @PostMapping("/forgotPwdOtpVerification")
+    @PostMapping("/forgotPassOtpVerificationAdmin")
     public ResponseWrapperDTO forgotPwdOtpVerification(@RequestBody ForgotPassSendOtpRequest request, HttpServletRequest httpServletRequest) {
         String res = loginService.forgotPwdOtpVerification(request.getEmail(), request.getOtp());
         return ResponseWrapperDTO.successResponse(res, res, httpServletRequest);

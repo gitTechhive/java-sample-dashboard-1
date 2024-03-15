@@ -20,6 +20,7 @@ import com.sampledashboard1.service.LoginService;
 import com.sampledashboard1.service.RefreshTokenService;
 import com.sampledashboard1.utils.MessageUtils;
 import com.sampledashboard1.utils.MethodUtils;
+import io.swagger.v3.oas.annotations.Operation;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -53,6 +54,7 @@ public class LoginController {
      * @param httpServletRequest
      * @return
      */
+    @Operation( description = "This API Used for Login (Two type Login 1) login to Email and password 2) login to Google )")
     @PostMapping("login")
     public ResponseWrapperDTO login(@RequestBody LoginRequest loginForm, HttpServletRequest httpServletRequest) {
         if(MethodUtils.isObjectisNullOrEmpty(loginForm.getUuid())){
@@ -145,6 +147,7 @@ public class LoginController {
      * @param httpServletRequest
      * @return
      */
+    @Operation( description = "This API Used for Login (Login to phone number)")
     @PostMapping("/loginPhoneNo")
     public ResponseWrapperDTO loginPhoneNo(@Valid @RequestBody LoginPhoneNoRequest request, HttpServletRequest httpServletRequest) {
         return ResponseWrapperDTO.successResponse(MessageUtils.get("login.controller.login"), loginService.loginPhoneNo(request.getPhoneNo(), request.getOtp()), httpServletRequest);
@@ -156,6 +159,7 @@ public class LoginController {
      * @param httpServletRequest
      * @return
      */
+    @Operation( description = "This API Used for send OTP Login with Phone")
     @GetMapping("/sendOtpLoginPhoneNo")
     public ResponseWrapperDTO sendOtpLoginPhoneNo(@Valid @RequestParam String phoneNo, @RequestParam String uuid, @RequestParam String countryCode, HttpServletRequest httpServletRequest) {
         return ResponseWrapperDTO.successResponse("OTP Send Successfully", loginService.sendOtpLoginPhoneNo(phoneNo,uuid,countryCode), httpServletRequest);
@@ -167,6 +171,7 @@ public class LoginController {
      * @param httpServletRequest
      * @return
      */
+    @Operation( description = "This API Used for RefreshToken")
     @PostMapping("refreshToken")
     public ResponseWrapperDTO refreshToken(@Valid @RequestBody TokenRefreshRequest request, HttpServletRequest httpServletRequest) {
 
@@ -183,11 +188,12 @@ public class LoginController {
     }
 
     /**
-     * This API Used for forgot password send OTP in  mail
+     * This API Used for forgot password send OTP in Email
      * @param request
      * @param httpServletRequest
      * @return
      */
+    @Operation( description = "This API Used for forgot password send OTP in Email")
     @PostMapping("forgotPassOtpGeneratorAdmin")
     public ResponseWrapperDTO forgotPwdSendEmail(@RequestBody ForgotPassSendOtpRequest request, HttpServletRequest httpServletRequest) {
         String res = loginService.forgotPwdSendEmail(request.getEmail());
@@ -200,6 +206,8 @@ public class LoginController {
      * @param httpServletRequest
      * @return
      */
+    @Operation( description = "This API Used for forgot password OTP Verification")
+
     @PostMapping("/forgotPassOtpVerificationAdmin")
     public ResponseWrapperDTO forgotPwdOtpVerification(@RequestBody ForgotPassSendOtpRequest request, HttpServletRequest httpServletRequest) {
         String res = loginService.forgotPwdOtpVerification(request.getEmail(), request.getOtp());
@@ -211,6 +219,7 @@ public class LoginController {
      * @param httpServletRequest
      * @return
      */
+    @Operation( description = "This API Used for forgot Password")
     @PostMapping("/forgotPwd")
     public ResponseWrapperDTO forgotPwd(@RequestBody ForgotPassRequest forgotPassRequest, HttpServletRequest httpServletRequest) {
         String res = loginService.forgotPwd(forgotPassRequest.getEmail(), forgotPassRequest.getPassword());
@@ -223,6 +232,7 @@ public class LoginController {
      * @param httpServletRequest
      *
      */
+    @Operation( description = "This API Used for change Password")
     @PostMapping("/changePwd")
     public ResponseWrapperDTO changePwd(@Valid @RequestBody ChangePassRequest request, HttpServletRequest httpServletRequest) {
         String res = loginService.changePwd(request.getOldPassword(), request.getNewPassword());

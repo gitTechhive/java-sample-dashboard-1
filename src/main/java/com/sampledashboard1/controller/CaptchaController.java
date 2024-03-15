@@ -4,6 +4,7 @@ import com.sampledashboard1.filter.ResponseWrapperDTO;
 import com.sampledashboard1.payload.request.CaptchaRequest;
 import com.sampledashboard1.service.CaptchaService;
 import com.sampledashboard1.utils.MessageUtils;
+import io.swagger.v3.oas.annotations.Operation;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.validation.annotation.Validated;
@@ -22,6 +23,7 @@ public class CaptchaController {
      * @param httpServletRequest
      * @return
      */
+    @Operation( description = "This API Used for generate Captcha")
     @GetMapping("/generate")
     public ResponseWrapperDTO generateCaptcha(HttpServletRequest httpServletRequest) {
         return ResponseWrapperDTO.successResponse(MessageUtils.get("captcha.controller.generateCaptcha"), captchaService.generateCaptcha(), httpServletRequest);
@@ -33,6 +35,7 @@ public class CaptchaController {
      * @param httpServletRequest
      * @return
      */
+    @Operation( description = "This API Used for Re-Generate Captcha")
     @PostMapping("/reGenerate")
     public ResponseWrapperDTO reGenerateCaptcha(@RequestBody CaptchaRequest captchaRequest, HttpServletRequest httpServletRequest) {
         return ResponseWrapperDTO.successResponse(MessageUtils.get("captcha.controller.generateCaptcha"), captchaService.reGenerateCaptcha(captchaRequest.getUuId()), httpServletRequest);
@@ -43,6 +46,7 @@ public class CaptchaController {
      * @param httpServletRequest
      * @return
      */
+    @Operation( description = "This API used for Captcha verification")
     @PostMapping("/verification")
     public ResponseWrapperDTO verificationCaptcha(@RequestBody CaptchaRequest request, HttpServletRequest httpServletRequest) {
         return ResponseWrapperDTO.successResponse(MessageUtils.get("captcha.controller.verificationCaptcha"), captchaService.verificationCaptcha(request.getUuId(), request.getHiddenCaptcha()), httpServletRequest);

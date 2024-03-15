@@ -16,6 +16,7 @@ import com.sampledashboard1.service.OtpVerificationService;
 import com.sampledashboard1.service.UsersService;
 import com.sampledashboard1.utils.MessageUtils;
 import com.sampledashboard1.utils.MethodUtils;
+import io.swagger.v3.oas.annotations.Operation;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -48,6 +49,7 @@ public class UsersController {
      * @param saveUsersData
      * @param httpServletRequest
      */
+    @Operation( description = "This API Used For OTP verification if(verification is done then after save User)")
     @PostMapping("/")
     public ResponseWrapperDTO otpVerification(@Valid @RequestBody SaveUsersRequest saveUsersData,
                                               HttpServletRequest httpServletRequest) {
@@ -60,6 +62,7 @@ public class UsersController {
      * @param httpServletRequest
      * @return
      */
+    @Operation( description = "This API Used For SingUp in Google")
     @PostMapping("/singUpGoogle")
     public ResponseWrapperDTO singUpGoogle(@Valid @RequestBody SignUpGoogleRequest request,
                                            HttpServletRequest httpServletRequest) {
@@ -72,6 +75,7 @@ public class UsersController {
      * @param mailRequest
      * @param httpServletRequest
      */
+    @Operation( description = "This API Used For send email")
     @PostMapping("send")
     public ResponseWrapperDTO sendEmail(@RequestBody MailRequest mailRequest, HttpServletRequest httpServletRequest) {
         return ResponseWrapperDTO.successResponse("Send Email Successfully", emailService.sendEmail(mailRequest), httpServletRequest);
@@ -83,7 +87,7 @@ public class UsersController {
      * @param sendOtpRequest
      * @param httpServletRequest
      */
-
+    @Operation( description = "This API Used For send OTP in email verification")
     @PostMapping("/sendOtp")
     public ResponseWrapperDTO sendOtp(@RequestBody SaveUsersRequest sendOtpRequest, HttpServletRequest httpServletRequest) {
         return ResponseWrapperDTO.successResponse("OTP Send Successfully", otpVerificationService.sendOtp(sendOtpRequest), httpServletRequest);
@@ -95,6 +99,7 @@ public class UsersController {
      * @param saveUsersData
      * @param httpServletRequest
      */
+    @Operation( description = "This API used for update User")
     @PostMapping("/updateUser")
     public ResponseWrapperDTO updateUsers(@Valid @RequestParam(name = "profilePic", required = false) MultipartFile file,
                                           @RequestParam(name = "userInfo") String saveUsersData,
@@ -145,7 +150,7 @@ public class UsersController {
      * @param httpServletRequest
      * @return user Object
      */
-
+    @Operation( description = "This API used for specific user Id to get data")
     @GetMapping("/getUserData")
     public ResponseWrapperDTO getUserData( HttpServletRequest httpServletRequest) {
         return ResponseWrapperDTO.successResponse(MessageUtils.get("users.controller.profile"), usersService.getUsers(), httpServletRequest);

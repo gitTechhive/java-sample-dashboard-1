@@ -57,20 +57,22 @@ public class LoginController {
     @Operation( description = "This API Used for Login (Two type Login 1) login to Email and password 2) login to Google )")
     @PostMapping("login")
     public ResponseWrapperDTO login(@RequestBody LoginRequest loginForm, HttpServletRequest httpServletRequest) {
-        if(MethodUtils.isObjectisNullOrEmpty(loginForm.getUuid())){
-            throw new UserDefineException("uuid not found !");
-        }
-        Captcha dataByUID = captchaRepository.getDataByUID(loginForm.getUuid());
-        LocalDateTime currentDateTime = LocalDateTime.now();
-        int i = dataByUID.getExpiryTimestamp().compareTo(currentDateTime);
-        if(i<0 ){
-            throw new UserDefineException("Your Captcha Expire.");
-        }
-        if((Boolean.FALSE.equals( dataByUID.getIsVerified())) || dataByUID.getIsVerified() == null ){
-            throw new UserDefineException("Your Captcha Not Verified");
-        }
+
 
         if(loginForm.getType().equals(EnumForLoginType.EMAIL.value())){
+
+            if(MethodUtils.isObjectisNullOrEmpty(loginForm.getUuid())){
+                throw new UserDefineException("uuid not found !");
+            }
+            Captcha dataByUID = captchaRepository.getDataByUID(loginForm.getUuid());
+            LocalDateTime currentDateTime = LocalDateTime.now();
+            int i = dataByUID.getExpiryTimestamp().compareTo(currentDateTime);
+            if(i<0 ){
+                throw new UserDefineException("Your Captcha Expire.");
+            }
+            if((Boolean.FALSE.equals( dataByUID.getIsVerified())) || dataByUID.getIsVerified() == null ){
+                throw new UserDefineException("Your Captcha Not Verified");
+            }
             Authentication authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(loginForm.getEmail(), loginForm.getPassword()));
 
             /*if (authentication.getAuthorities().isEmpty()) {
@@ -150,21 +152,25 @@ public class LoginController {
     @Operation( description = "This API Used for Login (Login to phone number)")
     @PostMapping("/loginPhoneNo")
     public ResponseWrapperDTO loginPhoneNo(@Valid @RequestBody LoginPhoneNoRequest request, HttpServletRequest httpServletRequest) {
-        return ResponseWrapperDTO.successResponse(MessageUtils.get("login.controller.login"), loginService.loginPhoneNo(request.getPhoneNo(), request.getOtp()), httpServletRequest);
+        return ResponseWrapperDTO.successResponse(MessageUtils.get("login.controller.login"), loginService.loginPhoneNo(request.getPhoneNo(), request.getOtp(),request.getCountryCode()), httpServletRequest);
     }
 
     /**
      * This API Used for send OTP Login with Phone
-     * @param phoneNo
      * @param httpServletRequest
      * @return
      */
-    @Operation( description = "This API Used for send OTP Login with Phone")
-    @GetMapping("/sendOtpLoginPhoneNo")
+  /*  @Operation( description = "This API Used for send OTP Login with Phone")
+    @PostMapping("/sendOtpLoginPhoneNo")
     public ResponseWrapperDTO sendOtpLoginPhoneNo(@Valid @RequestParam String phoneNo, @RequestParam String uuid, @RequestParam String countryCode, HttpServletRequest httpServletRequest) {
         return ResponseWrapperDTO.successResponse("OTP Send Successfully", loginService.sendOtpLoginPhoneNo(phoneNo,uuid,countryCode), httpServletRequest);
+    }*/
+    @Operation( description = "This API Used for send OTP Login with Phone")
+    @PostMapping("/sendOtpLoginPhoneNo")
+    public ResponseWrapperDTO sendOtpLoginPhoneNo(@RequestBody SendOtpLoginPhoneNoRequest request, HttpServletRequest httpServletRequest) {
+        return ResponseWrapperDTO.successResponse("OTP Send Successfully", loginService.sendOtpLoginPhoneNo(request.getPhoneNo(), request.getUuid(), request.getCountryCode()), httpServletRequest);
     }
-
+//@RequestParam String phoneNo, @RequestParam String uuid, @RequestParam String countryCode
     /**
      * This API Used for RefreshToken
      * @param request

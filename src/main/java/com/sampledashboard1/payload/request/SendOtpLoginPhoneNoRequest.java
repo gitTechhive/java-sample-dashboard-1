@@ -7,8 +7,8 @@ import lombok.Setter;
 @Getter
 @Setter
 @JsonInclude(JsonInclude.Include.NON_EMPTY)
-public class LoginPhoneNoRequest {
+public class SendOtpLoginPhoneNoRequest {
     private String phoneNo;
-    private String otp;
+    private String uuid;
     private String countryCode;
 }

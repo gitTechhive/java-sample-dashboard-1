@@ -52,7 +52,8 @@ public class LoginServiceImpl implements LoginService {
         emailService.sendEmail(MailRequest.builder()
                 .to(email)
                 .subject("SampleDashBoard Verify Email")
-                .body("Your Request Id Is : " + string + "And  OTP Is : " + s)
+               // .body("Your Request Id Is : " + string + "And  OTP Is : " + s)
+                .body("OTP Is : " + s)
                 .build());
         otpVerificationRepository.save(otpVerification);
         return MessageUtils.get("login.service.email");
@@ -95,7 +96,7 @@ public class LoginServiceImpl implements LoginService {
         return MessageUtils.get("login.service.change.pwd");
     }
     @Override
-    public LoginResponse loginPhoneNo(String phoneNo, String otp) {
+    public LoginResponse loginPhoneNo(String phoneNo, String otp,String countryCode) {
 
         //otp verification
         OtpVerification dataByPhoneNoOrOtp = otpVerificationRepository.getDataByPhoneNoOrOtp(phoneNo, otp);
@@ -129,6 +130,7 @@ public class LoginServiceImpl implements LoginService {
 
     @Override
     public String sendOtpLoginPhoneNo(String phoneNo,String uuid,String code) {
+
         Captcha dataByUID = captchaRepository.getDataByUID(uuid);
         LocalDateTime currentDateTime = LocalDateTime.now();
         int i = dataByUID.getExpiryTimestamp().compareTo(currentDateTime);

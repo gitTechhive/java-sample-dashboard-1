@@ -13,5 +13,5 @@ public class SignUpGoogleRequest {
     private String email;
     private String googleId;
     private String type;
-    private String uuid;
+  //  private String uuid;
 }

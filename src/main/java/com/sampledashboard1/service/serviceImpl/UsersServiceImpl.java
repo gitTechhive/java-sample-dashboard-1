@@ -58,7 +58,7 @@ public class UsersServiceImpl implements UsersService {
         users.setFirstName(request.getFirstName());
         users.setLastName(request.getLastName());
         users.setAddress(request.getAddress());
-        //   users.setCountry(request.getCountry());
+        users.setPhonecode(request.getPhonecode());
         users.setPinCode(request.getPinCode());
         // users.setState(request.getState());
         users.setMobileNo(request.getMobileNo());
@@ -116,10 +116,10 @@ public class UsersServiceImpl implements UsersService {
 
     @Override
     public SignUpGoogleResponse signUpGoogle(SignUpGoogleRequest request) {
-        if (MethodUtils.isObjectisNullOrEmpty(request.getUuid())) {
+       /* if (MethodUtils.isObjectisNullOrEmpty(request.getUuid())) {
             throw new UserDefineException("uuid not found !");
-        }
-        Captcha dataByUID = captchaRepository.getDataByUID(request.getUuid());
+        }*/
+      /*  Captcha dataByUID = captchaRepository.getDataByUID(request.getUuid());
         LocalDateTime currentDateTime = LocalDateTime.now();
         int i = dataByUID.getExpiryTimestamp().compareTo(currentDateTime);
         if (i < 0) {
@@ -127,7 +127,7 @@ public class UsersServiceImpl implements UsersService {
         }
         if ((Boolean.FALSE.equals(dataByUID.getIsVerified())) || dataByUID.getIsVerified() == null) {
             throw new UserDefineException("Your Captcha Not Verified");
-        }
+        }*/
         if (request != null && (request.getEmail() != null || !request.getEmail().isEmpty())) {
 
             Optional<Login> byEmail = loginRepository.findByEmail(request.getEmail());

@@ -10,7 +10,7 @@ public interface LoginService {
 
     String forgotPwd(String email,String password);
     String changePwd(String crnPass, String pwd);
-    LoginResponse loginPhoneNo(String phoneNo, String otp);
+    LoginResponse loginPhoneNo(String phoneNo, String otp,String countryCode);
 
     String sendOtpLoginPhoneNo(String phoneNo,String uuid,String code);
 }

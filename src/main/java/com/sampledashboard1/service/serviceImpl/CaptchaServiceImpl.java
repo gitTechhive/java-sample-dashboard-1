@@ -34,7 +34,7 @@ public class CaptchaServiceImpl implements CaptchaService {
         String string = UUID.randomUUID().toString();
         newCaptcha.setUuid(string);
         LocalDateTime currentDateTime = LocalDateTime.now();
-        newCaptcha.setExpiryTimestamp(currentDateTime.plusMinutes(1));
+        newCaptcha.setExpiryTimestamp(currentDateTime.plusMinutes(1)); // 1 min exp
         captchaRepository.save(newCaptcha);
         return new Captcha(newCaptcha.getUuid(),newCaptcha.getRealCaptcha()) ;
     }

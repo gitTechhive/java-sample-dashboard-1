@@ -170,7 +170,7 @@ public class LoginController {
     public ResponseWrapperDTO sendOtpLoginPhoneNo(@RequestBody SendOtpLoginPhoneNoRequest request, HttpServletRequest httpServletRequest) {
         return ResponseWrapperDTO.successResponse("OTP Send Successfully", loginService.sendOtpLoginPhoneNo(request.getPhoneNo(), request.getUuid(), request.getCountryCode()), httpServletRequest);
     }
-//@RequestParam String phoneNo, @RequestParam String uuid, @RequestParam String countryCode
+
     /**
      * This API Used for RefreshToken
      * @param request
@@ -202,8 +202,8 @@ public class LoginController {
     @Operation( description = "This API Used for forgot password send OTP in Email")
     @PostMapping("forgotPassOtpGeneratorAdmin")
     public ResponseWrapperDTO forgotPwdSendEmail(@RequestBody ForgotPassSendOtpRequest request, HttpServletRequest httpServletRequest) {
-        String res = loginService.forgotPwdSendEmail(request.getEmail());
-        return ResponseWrapperDTO.successResponse(res, res, httpServletRequest);
+      //  String res = loginService.forgotPwdSendEmail(request.getEmail());
+        return ResponseWrapperDTO.successResponse("OTP sent on your email", loginService.forgotPwdSendEmail(request.getEmail()), httpServletRequest);
     }
 
     /**
@@ -216,7 +216,7 @@ public class LoginController {
 
     @PostMapping("/forgotPassOtpVerificationAdmin")
     public ResponseWrapperDTO forgotPwdOtpVerification(@RequestBody ForgotPassSendOtpRequest request, HttpServletRequest httpServletRequest) {
-        String res = loginService.forgotPwdOtpVerification(request.getEmail(), request.getOtp());
+        String res = loginService.forgotPwdOtpVerification(request.getEmail(), request.getOtp(),request.getRequestId());
         return ResponseWrapperDTO.successResponse(res, res, httpServletRequest);
     }
 

@@ -12,4 +12,5 @@ public class ForgotPassSendOtpRequest {
     @NotEmpty(message = "{forgotPass.token.is.required}")
     String email;
     String otp;
+    String requestId;
 }

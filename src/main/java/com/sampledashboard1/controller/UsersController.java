@@ -102,7 +102,7 @@ public class UsersController {
     @Operation( description = "This API used for update User")
     @PostMapping("/updateUser")
     public ResponseWrapperDTO updateUsers(@Valid @RequestParam(name = "profilePic", required = false) MultipartFile file,
-                                          @RequestParam(name = "userInfo") String saveUsersData,
+                                              @RequestParam(name = "userInfo") String saveUsersData,
                                           HttpServletRequest httpServletRequest) throws IOException {
 
         SaveUsersRequest saveUsersRequest = convertJsonToUserRequest(saveUsersData);

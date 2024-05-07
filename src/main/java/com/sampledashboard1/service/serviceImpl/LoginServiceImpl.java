@@ -21,6 +21,8 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.UUID;
 
 @Service
@@ -38,30 +40,37 @@ public class LoginServiceImpl implements LoginService {
     private final CaptchaRepository captchaRepository;
 
     @Override
-    public String forgotPwdSendEmail(String email) {
-        OtpVerification otpVerification = otpVerificationRepository.findByRequestValue(email);
-        if (otpVerification == null) {
-            throw new UserDefineException("Please enter registered email.");
+    public Map<String,String> forgotPwdSendEmail(String email) {
+        Map<String,String> map=new HashMap<>();
+      //  OtpVerification otpVerification = otpVerificationRepository.findByRequestValue(email);
+
+        Login login =loginRepository.findByEmail(email).orElseThrow(()-> new UserDefineException("Email not found."));
+        if (login == null) {
+            throw new UserDefineException("Email not found.");
         }
+        OtpVerification otpVerification=new OtpVerification();
         String s = MethodUtils.generateRandomInteger(6);
         otpVerification.setOtp(s);
-        String string = UUID.randomUUID().toString();
-        otpVerification.setRequestId(string);
+        String requestId = UUID.randomUUID().toString();
+        otpVerification.setRequestId(requestId);
+        otpVerification.setRequestType("email");
+        otpVerification.setRequestValue(email);
         LocalDateTime currentDateTime = LocalDateTime.now();
         otpVerification.setOtpExpiredOn(currentDateTime.plusMinutes(10));
         emailService.sendEmail(MailRequest.builder()
                 .to(email)
                 .subject("SampleDashBoard Verify Email")
-               // .body("Your Request Id Is : " + string + "And  OTP Is : " + s)
+               // .body("Your Request Id Is : " + requestId + "And  OTP Is : " + s)
                 .body("OTP Is : " + s)
                 .build());
         otpVerificationRepository.save(otpVerification);
-        return MessageUtils.get("login.service.email");
+        map.put("requestId",requestId);
+        return map;
     }
 
     @Override
-    public String forgotPwdOtpVerification(String email, String otp) {
-        OtpVerification otpVerification = otpVerificationRepository.getDataByEmailOrOtp(email, otp);
+    public String forgotPwdOtpVerification(String email, String otp,String requestId) {
+        OtpVerification otpVerification = otpVerificationRepository.getDataByEmailOrOtp(email, otp,requestId);
         if (otpVerification == null) {
             throw new UserDefineException("Please enter valid otp.");
         }
@@ -151,7 +160,7 @@ public class LoginServiceImpl implements LoginService {
         }
         otpVerification.setRequestType("mobile");
         otpVerification.setRequestValue(phoneNo);
-        //set static otp send  -> 12345
+        //set static otp send  -> 123456
         otpVerification.setOtp("123456");
         otpVerificationRepository.save(otpVerification);
         return MessageUtils.get("login.service.val.OtpSend");

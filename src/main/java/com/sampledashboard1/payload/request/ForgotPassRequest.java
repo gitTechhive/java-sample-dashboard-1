@@ -13,4 +13,5 @@ public class ForgotPassRequest {
     String email;
     @NotEmpty(message = "{forgotPass.password.is.required}")
     String password;
+    String requestId;
 }

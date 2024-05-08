@@ -22,7 +22,7 @@ public class UserDoc extends Auditable<Long> {
     private String originalName;
     private String formattedName;
     private String url;
-    private Boolean isDeleted;
+//    private Boolean isDeleted;
 
     @OneToOne
     @JsonIgnore

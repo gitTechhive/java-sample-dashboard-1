@@ -105,10 +105,10 @@ public class LoginServiceImpl implements LoginService {
         return MessageUtils.get("login.service.change.pwd");
     }
     @Override
-    public LoginResponse loginPhoneNo(String phoneNo, String otp,String countryCode) {
+    public LoginResponse loginPhoneNo(String phoneNo, String otp,String countryCode,String requestId) {
 
         //otp verification
-        OtpVerification dataByPhoneNoOrOtp = otpVerificationRepository.getDataByPhoneNoOrOtp(phoneNo, otp);
+        OtpVerification dataByPhoneNoOrOtp = otpVerificationRepository.getDataByPhoneNoOrOtp(phoneNo, otp,requestId);
         if (dataByPhoneNoOrOtp == null) {
             throw new UserDefineException("Invalid OTP");
         }

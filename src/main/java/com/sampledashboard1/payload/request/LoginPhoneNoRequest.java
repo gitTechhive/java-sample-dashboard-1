@@ -11,4 +11,5 @@ public class LoginPhoneNoRequest {
     private String phoneNo;
     private String otp;
     private String countryCode;
+    private String requestId;
 }
